@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bolsa de Trabajo - Autenticación</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="logo-header">
+            <h1>Bolsa de Trabajo Verificada</h1>
+            <p>Empleos seguros y confiables</p>
+        </div>
+
+        <!-- REGISTRO -->
+        <form id="formRegistro" class="form-box active">
+            <h2>Crear Cuenta Nueva</h2>
+
+            <div class="tipo-usuario">
+                <p class="label-tipo">Registrarse como:</p>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="tipoUsuario" value="candidato" checked>
+                        <span class="radio-custom"></span>
+                        <div class="radio-content"><strong>Candidato</strong><small>Buscar empleo y postularse</small></div>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="tipoUsuario" value="empresa">
+                        <span class="radio-custom"></span>
+                        <div class="radio-content"><strong>Empresa</strong><small>Publicar vacantes verificadas</small></div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="nombreRegistro">Nombre Completo / Razón Social *</label>
+                <input type="text" id="nombreRegistro" placeholder="Ej: Juan Pérez / Empresa S.A." required>
+            </div>
+            <div class="input-group">
+                <label for="correoRegistro">Correo Electrónico *</label>
+                <input type="email" id="correoRegistro" placeholder="correo@ejemplo.com" required>
+            </div>
+            <div class="input-group">
+                <label for="telefonoRegistro">Teléfono *</label>
+                <input type="tel" id="telefonoRegistro" placeholder="664 123 4567" required>
+            </div>
+
+            <!-- Campos Empresa -->
+            <div id="camposEmpresa" class="campos-especificos" style="display:none">
+                <div class="input-group">
+                    <label for="rfcEmpresa">RFC de la Empresa *</label>
+                    <input type="text" id="rfcEmpresa" placeholder="XAXX010101000" maxlength="13">
+                </div>
+                <div class="input-group">
+                    <label for="sitioWeb">Sitio Web (opcional)</label>
+                    <input type="url" id="sitioWeb" placeholder="https://www.empresa.com">
+                </div>
+                <div class="input-group">
+                    <label for="direccionEmpresa">Dirección de la Empresa *</label>
+                    <input type="text" id="direccionEmpresa" placeholder="Calle, Número, Colonia, Ciudad">
+                </div>
+            </div>
+
+            <!-- Campos Candidato -->
+            <div id="camposCandidato" class="campos-especificos">
+                <div class="input-group">
+                    <label for="edadCandidato">Edad *</label>
+                    <input type="number" id="edadCandidato" placeholder="18" min="18" max="100">
+                </div>
+                <div class="input-group">
+                    <label for="ubicacionCandidato">Ubicación (Ciudad) *</label>
+                    <input type="text" id="ubicacionCandidato" placeholder="Ej: Ciudad Juárez, Chihuahua">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="passwordRegistro">Contraseña *</label>
+                <input type="password" id="passwordRegistro" placeholder="Mínimo 8 caracteres" required minlength="8">
+                <small>Debe incluir mayúsculas, minúsculas y números</small>
+            </div>
+            <div class="input-group">
+                <label for="passwordConfirm">Confirmar Contraseña *</label>
+                <input type="password" id="passwordConfirm" placeholder="Repite tu contraseña" required>
+            </div>
+
+            <div class="aviso aviso-privacidad">
+                <strong>Aviso de Privacidad</strong>
+                <p>Tus datos serán tratados conforme a la Ley Federal de Protección de Datos Personales, usados exclusivamente para:</p>
+                <ul>
+                    <li>Gestionar tu cuenta en la plataforma</li>
+                    <li>Facilitar la búsqueda y postulación a empleos</li>
+                    <li>Comunicación con empresas verificadas</li>
+                    <li>Envío de notificaciones de empleo</li>
+                </ul>
+                <p><strong>No compartiremos tu información con terceros sin tu consentimiento.</strong></p>
+            </div>
+
+            <div class="aviso aviso-terminos">
+                <strong>Términos y Condiciones de Uso</strong>
+                <ul>
+                    <li><strong>Candidatos:</strong> Información veraz y actualizada en tu perfil y CV.</li>
+                    <li><strong>Empresas:</strong> Solo vacantes reales. Requiere proceso de verificación.</li>
+                    <li>Prohibido el uso fraudulento o ilícito de la plataforma.</li>
+                    <li>La plataforma puede eliminar cuentas que violen estas políticas.</li>
+                    <li>Datos de contacto no deben usarse para spam o publicidad no autorizada.</li>
+                </ul>
+            </div>
+
+            <div class="aviso aviso-seguridad">
+                <strong>Compromiso de Seguridad y Anti-Fraude</strong>
+                <p><strong>Nuestra plataforma garantiza:</strong></p>
+                <ul>
+                    <li>Verificación obligatoria de empresas antes de publicar vacantes</li>
+                    <li>Moderación de contenido y reportes de usuarios</li>
+                    <li>Sistema de reputación y calificaciones</li>
+                    <li>Protección de datos con cifrado HTTPS</li>
+                    <li>Mecanismos contra bots y cuentas falsas</li>
+                </ul>
+                <p><strong>Reporta cualquier actividad sospechosa de inmediato.</strong></p>
+            </div>
+
+            <div class="checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="consentimientoPrivacidad" required>
+                    <span>He leído y acepto el <strong>Aviso de Privacidad</strong> *</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="consentimientoTerminos" required>
+                    <span>Acepto los <strong>Términos y Condiciones</strong> de uso *</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="consentimientoAntiFraude" required>
+                    <span>Acepto el <strong>Compromiso Anti-Fraude</strong> y me comprometo a usar la plataforma responsablemente *</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="consentimientoNotificaciones">
+                    <span>Deseo recibir notificaciones de vacantes y alertas de seguridad (opcional)</span>
+                </label>
+                <label class="checkbox-label" id="checkboxVerificacionEmpresa" style="display:none">
+                    <input type="checkbox" id="consentimientoVerificacion">
+                    <span>Autorizo la <strong>verificación de mi empresa</strong> mediante documentos oficiales *</span>
+                </label>
+            </div>
+
+            <button type="submit" class="btn-primary">
+                <span id="textoBotonRegistro">Crear Cuenta como Candidato</span>
+            </button>
+            <p id="mensajeRegistro" class="mensaje"></p>
+            <div class="toggle-form">
+                <p>¿Ya tienes cuenta? <a href="#" id="irLogin">Inicia Sesión</a></p>
+            </div>
+        </form>
+
+        <!-- LOGIN -->
+        <form id="formLogin" class="form-box">
+            <h2>Iniciar Sesión</h2>
+
+            <div class="input-group">
+                <label for="correoLogin">Correo Electrónico</label>
+                <input type="email" id="correoLogin" placeholder="correo@ejemplo.com" required>
+            </div>
+            <div class="input-group">
+                <label for="passwordLogin">Contraseña</label>
+                <input type="password" id="passwordLogin" placeholder="Tu contraseña" required>
+            </div>
+
+            <div class="tipo-usuario-login">
+                <p class="label-tipo">Iniciar sesión como:</p>
+                <div class="radio-group-inline">
+                    <label class="radio-label-inline"><input type="radio" name="tipoLogin" value="candidato" checked><span>Candidato</span></label>
+                    <label class="radio-label-inline"><input type="radio" name="tipoLogin" value="empresa"><span>Empresa</span></label>
+                    <label class="radio-label-inline"><input type="radio" name="tipoLogin" value="admin"><span>Admin</span></label>
+                </div>
+            </div>
+
+            <div class="checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="recordarme">
+                    <span>Recordar mi sesión</span>
+                </label>
+            </div>
+
+            <button type="submit" class="btn-primary">Iniciar Sesión</button>
+            <p id="mensajeLogin" class="mensaje"></p>
+            <div class="recuperar"><a href="#">¿Olvidaste tu contraseña?</a></div>
+            <div class="toggle-form">
+                <p>¿No tienes cuenta? <a href="#" id="irRegistro">Regístrate</a></p>
+            </div>
+        </form>
+    </div>
+
+    <div class="info-footer">
+        <p>Conexión segura | Empresas verificadas | Sistema anti-fraude activo</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
