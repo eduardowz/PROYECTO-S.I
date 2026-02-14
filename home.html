@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Bolsa de Trabajo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="home.css">
+  <style>
+    /* Estilos extra para elementos de sesión */
+    .usuario-info {
+      background: rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 15px;
+      font-size: 13px;
+    }
+    .usuario-info span {
+      display: block;
+      font-weight: bold;
+      font-size: 15px;
+      margin-bottom: 3px;
+    }
+    .usuario-info small {
+      opacity: 0.8;
+      text-transform: capitalize;
+    }
+    .badge-rol {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-candidato { background: #2e6ec7; color: white; }
+    .badge-empresa   { background: #f0a500; color: white; }
+    .badge-admin     { background: #c0392b; color: white; }
+
+    .btn-logout {
+      display: block;
+      text-align: center;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-decoration: none;
+      margin-top: 10px;
+      background-color: rgba(255,255,255,0.15);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 14px;
+    }
+    .btn-logout:hover {
+      background-color: rgba(255,255,255,0.25);
+    }
+
+    /* Secciones por rol, ocultas por defecto */
+    .solo-candidato,
+    .solo-empresa,
+    .solo-admin,
+    .solo-logueado,
+    .solo-invitado { display: none; }
+
+    /* Aviso para invitados al postularse */
+    .aviso-invitado {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-top: 20px;
+      font-size: 14px;
+      display: none;
+    }
+
+    /* Panel admin */
+    .panel-admin {
+      background: #fff8f8;
+      border: 1px solid #f5c6cb;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 25px;
+    }
+    .panel-admin h3 { color: #c0392b; margin-bottom: 10px; }
+    .panel-admin p  { font-size: 14px; color: #555; }
+
+    /* Panel empresa */
+    .panel-empresa {
+      background: #fffbf0;
+      border: 1px solid #ffd97d;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 25px;
+    }
+    .panel-empresa h3 { color: #f0a500; margin-bottom: 10px; }
+    .panel-empresa p  { font-size: 14px; color: #555; }
+  </style>
+</head>
+
+<body>
+
+  <!-- MENÚ LATERAL -->
+  <aside class="menu-lateral">
+    <div>
+      <h3>BolsaTrabajo</h3>
+      <hr>
+
+      <!-- Info del usuario logueado -->
+      <div class="usuario-info solo-logueado" id="infoUsuario">
+        <span id="nombreUsuario">Usuario</span>
+        <small id="correoUsuario">correo@ejemplo.com</small>
+        <span class="badge-rol" id="badgeRol">rol</span>
+      </div>
+
+      <nav>
+        <a href="#">Inicio</a>
+        <a href="#">Vacantes</a>
+        <a href="#">Empresas</a>
+
+        <!-- Solo candidato -->
+        <a href="#" class="solo-candidato">Mi CV</a>
+        <a href="#" class="solo-candidato">Mis Postulaciones</a>
+
+        <!-- Solo empresa -->
+        <a href="#" class="solo-empresa">Publicar Vacante</a>
+        <a href="#" class="solo-empresa">Mis Vacantes</a>
+
+        <!-- Solo admin -->
+        <a href="#" class="solo-admin">Panel Admin</a>
+        <a href="#" class="solo-admin">Gestionar Usuarios</a>
+        <a href="#" class="solo-admin">Verificar Empresas</a>
+
+        <!-- Todos los logueados -->
+        <a href="#" class="solo-logueado">Mi Perfil</a>
+      </nav>
+    </div>
+
+    <!-- Botones abajo -->
+    <div class="auth">
+      <!-- Sin sesión -->
+      <a href="index.html" class="btn-login solo-invitado">Iniciar Sesión</a>
+      <a href="index.html" class="btn-register solo-invitado">Registrarse</a>
+
+      <!-- Con sesión -->
+      <button class="btn-logout solo-logueado" id="btnLogout">Cerrar Sesión</button>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="contenido">
+
+    <!-- Panel solo admin -->
+    <div class="panel-admin solo-admin">
+      <h3>Panel de Administración</h3>
+      <p>Tienes acceso completo al sistema. Puedes gestionar usuarios, verificar empresas y moderar vacantes.</p>
+    </div>
+
+    <!-- Panel solo empresa -->
+    <div class="panel-empresa solo-empresa">
+      <h3>Panel de Empresa</h3>
+      <p>Bienvenida, <strong id="nombreEmpresa"></strong>. Puedes publicar nuevas vacantes y gestionar tus postulantes.</p>
+    </div>
+
+    <h2 id="tituloPagina">Vacantes disponibles</h2>
+
+    <!-- Aviso para invitados -->
+    <div class="aviso-invitado solo-invitado" id="avisoInvitado">
+      Para postularte a una vacante debes <a href="index.html"><strong>iniciar sesión</strong></a> o <a href="index.html"><strong>registrarte</strong></a>.
+    </div>
+
+    <div class="vacantes">
+
+      <div class="card">
+        <h3>Desarrollador Web</h3>
+        <p><strong>Empresa:</strong> Tech Solutions</p>
+        <p><strong>Ubicación:</strong> Ciudad de México</p>
+        <p><strong>Salario:</strong> $20,000 MXN</p>
+        <button class="btn-postular">Postularme</button>
+      </div>
+
+      <div class="card">
+        <h3>Diseñador Gráfico</h3>
+        <p><strong>Empresa:</strong> Creativos MX</p>
+        <p><strong>Ubicación:</strong> Guadalajara</p>
+        <p><strong>Salario:</strong> $18,000 MXN</p>
+        <button class="btn-postular">Postularme</button>
+      </div>
+
+      <div class="card">
+        <h3>Auxiliar Administrativo</h3>
+        <p><strong>Empresa:</strong> Grupo Norteño</p>
+        <p><strong>Ubicación:</strong> Monterrey</p>
+        <p><strong>Salario:</strong> $15,000 MXN</p>
+        <button class="btn-postular">Postularme</button>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="home.js"></script>
+
+</body>
+</html>

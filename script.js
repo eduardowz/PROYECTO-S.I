@@ -167,13 +167,18 @@ formLogin.addEventListener("submit", (e) => {
     };
     mostrarMensaje(mensajeLogin, bienvenidas[usuario.tipo], "exito");
 
+    // Guardar siempre en sessionStorage para que home.js pueda leerlo
+    const datosSesion = JSON.stringify({ id: usuario.id, tipo: usuario.tipo, nombre: usuario.nombre, correo: usuario.correo });
+    sessionStorage.setItem("sesionActiva", datosSesion);
+
+    // Solo guardar en localStorage si marcó "Recordarme"
     if (recordarme.checked)
-        localStorage.setItem("sesionActiva", JSON.stringify({ id: usuario.id, tipo: usuario.tipo, nombre: usuario.nombre, correo: usuario.correo }));
+        localStorage.setItem("sesionActiva", datosSesion);
 
     setTimeout(() => {
         formLogin.reset();
         console.log("Usuario logueado:", usuario);
-        window.location.href = "dashboard.html";
+        window.location.href = "home.html";
     }, 1500);
 });
 
