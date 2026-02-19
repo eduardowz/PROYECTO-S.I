@@ -1,3 +1,5 @@
+console.log("SCRIPT CARGADO");
+
 // ══ PARTÍCULAS DEL FONDO ══════════════════════════════════
 const particlesContainer = document.getElementById("particles");
 const colores = ["rgba(240,165,0,.55)", "rgba(42,122,150,.6)", "rgba(255,255,255,.3)"];
@@ -181,6 +183,23 @@ formRegistro.addEventListener("submit", (e) => {
             : { edad: edadCandidato.value, ubicacion: ubicacionCandidato.value.trim(), cvSubido: false, postulaciones: [] })
     };
 
+    // 🔥 ENVIAR TAMBIÉN AL BACKEND (sin eliminar localStorage)
+    fetch("http://localhost:3000/api/users/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(nuevoUsuario)
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("Respuesta del servidor:", data);
+    })
+    .catch(err => {
+        console.log("Error al conectar con backend:", err);
+    });
+
+    // 🔹 Esto sigue funcionando igual
     usuarios.push(nuevoUsuario);
     localStorage.setItem("usuariosBolsaTrabajo", JSON.stringify(usuarios));
 
