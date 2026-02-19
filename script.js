@@ -72,6 +72,7 @@ const textoBotonRegistro  = document.getElementById("textoBotonRegistro");
 const radiosTipoUsuario   = document.querySelectorAll('input[name="tipoUsuario"]');
 
 let usuarios = JSON.parse(localStorage.getItem("usuariosBolsaTrabajo")) || [];
+let intentosfallidos =JSON.parse(localStorage.getItem("intentosfallidos")) || {};
 
 // ══ VALIDACIONES ═════════════════════════════════════════
 const validarEmail    = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -208,14 +209,66 @@ formLogin.addEventListener("submit", (e) => {
         return mostrarMensaje(mensajeLogin, "Por favor, completa todos los campos", "error");
     if (!validarEmail(correo))
         return mostrarMensaje(mensajeLogin, "El correo electrónico no es válido", "error");
+    
+const ahora = Date.now();
+    const claveIntento = `${correo}_${tipo}`;
+    const intento = intentosfallidos[claveIntento];
 
-    const usuario = usuarios.find(u => u.correo === correo && u.password === password && u.tipo === tipo);
+//Bloqueo de candidato y admin
+    if (tipo === "candidato" || tipo === "admin") {
+        if (intento && intento.contador >= 6) {
+            const tiempoEspera = 120000; //  va esperar para intentarlo a los 2 minutos en milisegundos
+            const tiempoTranscurrido = ahora - intento.primerIntento;
+    if (tiempoTranscurrido < tiempoEspera) {
+                const segundosRestantes = Math.ceil((tiempoEspera - tiempoTranscurrido) / 1000);
+                return mostrarMensaje(mensajeLogin, `Demasiados intentos fallidos. Espera ${segundosRestantes} segundos para intentar de nuevo.`, "error");
+            } else {
+                // se reinicia los intentos
+                delete intentosfallidos[claveIntento];
+                localStorage.setItem("intentosfallidos", JSON.stringify(intentosfallidos));
+            }
+        }
+    }
 
-    if (!usuario)
-        return mostrarMensaje(mensajeLogin, "Credenciales incorrectas o tipo de usuario no coincide", "error");
-    if (usuario.tipo === "empresa" && usuario.estado === "pendiente_verificacion")
+    
+const usuario = usuarios.find(u => u.correo === correo && u.password === password && u.tipo === tipo);
+if (!usuario){
+       if (tipo === "candidato" || tipo === "admin") {
+            if (intento) {
+                intentosfallidos[claveIntento].contador += 1;
+  
+                if (intentosfallidos[claveIntento].contador === 6) {
+        intentosfallidos[claveIntento].primerIntento = ahora;
+    }
+            } else {
+                intentosfallidos[claveIntento] = {
+                    contador: 1,
+                    primerIntento: ahora
+                };
+            }
+            localStorage.setItem("intentosfallidos", JSON.stringify(intentosfallidos));
+ //para q salgan el mensaje
+            const intentosActuales = intentosfallidos[claveIntento].contador;
+            const restantes = 6 - intentosActuales;
+            if (restantes > 0) {
+                return mostrarMensaje(mensajeLogin, `Credenciales incorrectas. Te quedan ${restantes} intento(s).`, "error");
+            } else {
+                return mostrarMensaje(mensajeLogin, "Has agotado tus 6 intentos. Espera 2 minutos.", "error");
+            }
+        }
+
+      return mostrarMensaje(mensajeLogin, "Credenciales incorrectas", "error");
+    }
+
+//  reinicio de intento
+    if (usuario && (tipo === "candidato" || tipo === "admin")) {
+        delete intentosfallidos[claveIntento];
+        localStorage.setItem("intentosfallidos", JSON.stringify(intentosfallidos));
+    }
+
+if (usuario.tipo === "empresa" && usuario.estado === "pendiente_verificacion")
         return mostrarMensaje(mensajeLogin, "Tu empresa aún está en proceso de verificación. Te notificaremos cuando esté lista.", "error");
-
+    
     const bienvenidas = {
         candidato: `Bienvenido/a ${usuario.nombre}. Redirigiendo a tu perfil...`,
         empresa:   `Bienvenida ${usuario.nombre}. Accediendo al panel de empresas...`,
