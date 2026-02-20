@@ -1,17 +1,15 @@
+
+
 // ── LEER SESIÓN ─────────────────────────────────────
-// sessionStorage: sesión activa en esta pestaña (siempre se guarda al login)
-// localStorage: solo si marcó "Recordarme"
 const sesionActiva = sessionStorage.getItem("sesionActiva") || localStorage.getItem("sesionActiva");
 const usuario = sesionActiva ? JSON.parse(sesionActiva) : null;
 
 // ── APLICAR ROL ─────────────────────────────────────
 function aplicarRol() {
   if (usuario) {
-    // Mostrar elementos de sesión activa
     document.querySelectorAll(".solo-logueado").forEach(el => el.style.display = "block");
     document.querySelectorAll(".solo-invitado").forEach(el => el.style.display = "none");
 
-    // Rellenar info del usuario
     document.getElementById("nombreUsuario").textContent = usuario.nombre;
     document.getElementById("correoUsuario").textContent = usuario.correo;
 
@@ -22,9 +20,10 @@ function aplicarRol() {
     // ── ROL: CANDIDATO ────────────────────────────────
     if (usuario.tipo === "candidato") {
       document.querySelectorAll(".solo-candidato").forEach(el => el.style.display = "block");
+      document.querySelectorAll(".solo-admin").forEach(el => el.style.display = "none");    // ← NUEVO
+      document.querySelectorAll(".solo-empresa").forEach(el => el.style.display = "none");  // ← NUEVO
       document.getElementById("tituloPagina").textContent = `Bienvenido/a, ${usuario.nombre}`;
 
-      // Botones postular: se marcan como postulado al hacer clic
       document.querySelectorAll(".btn-postular").forEach(btn => {
         btn.addEventListener("click", (e) => {
           const card = e.target.closest(".card");
@@ -40,12 +39,13 @@ function aplicarRol() {
     // ── ROL: EMPRESA ──────────────────────────────────
     if (usuario.tipo === "empresa") {
       document.querySelectorAll(".solo-empresa").forEach(el => el.style.display = "block");
+      document.querySelectorAll(".solo-admin").forEach(el => el.style.display = "none");      // ← NUEVO
+      document.querySelectorAll(".solo-candidato").forEach(el => el.style.display = "none");  // ← NUEVO
       document.getElementById("tituloPagina").textContent = "Panel de Empresa";
 
       const nombreEmpresa = document.getElementById("nombreEmpresa");
       if (nombreEmpresa) nombreEmpresa.textContent = usuario.nombre;
 
-      // Las empresas ven postulantes, no se postulan
       document.querySelectorAll(".btn-postular").forEach(btn => {
         btn.textContent = "Ver Postulantes";
         btn.style.background = "#f0a500";
@@ -55,9 +55,10 @@ function aplicarRol() {
     // ── ROL: ADMIN ────────────────────────────────────
     if (usuario.tipo === "admin") {
       document.querySelectorAll(".solo-admin").forEach(el => el.style.display = "block");
+      document.querySelectorAll(".solo-empresa").forEach(el => el.style.display = "none");    // ← NUEVO
+      document.querySelectorAll(".solo-candidato").forEach(el => el.style.display = "none");  // ← NUEVO
       document.getElementById("tituloPagina").textContent = "Panel de Administración";
 
-      // El admin puede eliminar vacantes
       document.querySelectorAll(".btn-postular").forEach(btn => {
         btn.textContent = "Eliminar Vacante";
         btn.style.background = "#c0392b";
@@ -69,7 +70,6 @@ function aplicarRol() {
     document.querySelectorAll(".solo-invitado").forEach(el => el.style.display = "block");
     document.querySelectorAll(".solo-logueado").forEach(el => el.style.display = "none");
 
-    // Mostrar aviso al intentar postularse
     document.querySelectorAll(".btn-postular").forEach(btn => {
       btn.addEventListener("click", () => {
         document.getElementById("avisoInvitado").style.display = "block";
@@ -87,3 +87,5 @@ document.getElementById("btnLogout").addEventListener("click", () => {
 
 // ── INIT ─────────────────────────────────────────────
 aplicarRol();
+
+
