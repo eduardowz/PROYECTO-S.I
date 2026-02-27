@@ -133,3 +133,6 @@ body {
 .card button:hover {
   background-color: #1E56A0;
 }
+nav a i {
+  margin-right: 10px; /* Ajusta este valor para más o menos separación */
+}
