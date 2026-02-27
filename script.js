@@ -184,7 +184,12 @@ formRegistro.addEventListener("submit", (e) => {
     };
 
     // 🔥 ENVIAR TAMBIÉN AL BACKEND (sin eliminar localStorage)
-    fetch("http://localhost:3000/api/users/register", {
+    
+    const ruta = tipo === "empresa"
+        ? "http://localhost:3000/api/empresas/register"
+        : "http://localhost:3000/api/users/register";
+
+    fetch(ruta, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -214,6 +219,7 @@ formRegistro.addEventListener("submit", (e) => {
     setTimeout(() => mostrarTab("login"), 3000);
 });
 
+
 // ══ LOGIN ════════════════════════════════════════════════
 formLogin.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -225,32 +231,98 @@ formLogin.addEventListener("submit", (e) => {
 
     if (!correo || !password)
         return mostrarMensaje(mensajeLogin, "Por favor, completa todos los campos", "error");
+
     if (!validarEmail(correo))
         return mostrarMensaje(mensajeLogin, "El correo electrónico no es válido", "error");
 
-    const usuario = usuarios.find(u => u.correo === correo && u.password === password && u.tipo === tipo);
+    // 🔥 LOGIN ADMIN (LOCAL)
+    if (tipo === "admin") {
 
-    if (!usuario)
-        return mostrarMensaje(mensajeLogin, "Credenciales incorrectas o tipo de usuario no coincide", "error");
-    if (usuario.tipo === "empresa" && usuario.estado === "pendiente_verificacion")
-        return mostrarMensaje(mensajeLogin, "Tu empresa aún está en proceso de verificación. Te notificaremos cuando esté lista.", "error");
+        const usuarios = JSON.parse(localStorage.getItem("usuariosBolsaTrabajo")) || [];
 
-    const bienvenidas = {
-        candidato: `Bienvenido/a ${usuario.nombre}. Redirigiendo a tu perfil...`,
-        empresa:   `Bienvenida ${usuario.nombre}. Accediendo al panel de empresas...`,
-        admin:     `Bienvenido Administrador. Cargando panel de control...`
-    };
-    mostrarMensaje(mensajeLogin, bienvenidas[usuario.tipo] || "Bienvenido.", "exito");
+        const admin = usuarios.find(u => 
+            u.tipo === "admin" &&
+            u.correo === correo &&
+            u.password === password
+        );
 
-    const datosSesion = JSON.stringify({ id: usuario.id, tipo: usuario.tipo, nombre: usuario.nombre, correo: usuario.correo });
-    sessionStorage.setItem("sesionActiva", datosSesion);
-    if (recordarme.checked) localStorage.setItem("sesionActiva", datosSesion);
+        if (!admin) {
+            return mostrarMensaje(mensajeLogin, "Credenciales de administrador incorrectas", "error");
+        }
 
-    setTimeout(() => {
-        formLogin.reset();
-        console.log("Usuario logueado:", usuario);
-        window.location.href = "home.html";
-    }, 1500);
+        const datosSesion = JSON.stringify({
+            tipo: "admin",
+            correo: admin.correo,
+            nombre: admin.nombre
+        });
+
+        sessionStorage.setItem("sesionActiva", datosSesion);
+
+        if (recordarme.checked) {
+            localStorage.setItem("sesionActiva", datosSesion);
+        }
+
+        mostrarMensaje(mensajeLogin, "Inicio de sesión admin exitoso", "exito");
+
+        setTimeout(() => {
+            window.location.href = "home.html";
+        }, 1200);
+
+        return; // ⛔ IMPORTANTE: corta aquí
+    }
+
+    // 🔥 LOGIN EMPRESA O CANDIDATO (BACKEND)
+    const rutaLogin = tipo === "empresa"
+        ? "http://localhost:3000/api/empresas/login"
+        : "http://localhost:3000/api/users/login";
+
+    fetch(rutaLogin, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            correo: correo,
+            password: password
+        })
+    })
+    .then(res => {
+        return res.json().then(data => ({
+            ok: res.ok,
+            data
+        }));
+    })
+    .then(({ ok, data }) => {
+        console.log("Respuesta login:", data);
+
+        if (ok) {
+
+            const datosSesion = JSON.stringify({
+                tipo: tipo,
+                correo: correo,
+                nombre: data.user?.nombre || data.empresa?.nombre
+            });
+
+            sessionStorage.setItem("sesionActiva", datosSesion);
+
+            if (recordarme.checked) {
+                localStorage.setItem("sesionActiva", datosSesion);
+            }
+
+            mostrarMensaje(mensajeLogin, "Inicio de sesión exitoso", "exito");
+
+            setTimeout(() => {
+                window.location.href = "home.html";
+            }, 1200);
+
+        } else {
+            mostrarMensaje(mensajeLogin, data.message || "Credenciales incorrectas", "error");
+        }
+    })
+    .catch(err => {
+        console.log("Error en login:", err);
+        mostrarMensaje(mensajeLogin, "Error al conectar con el servidor", "error");
+    });
 });
 
 // ══ NAVEGACIÓN (links internos) ═══════════════════════════

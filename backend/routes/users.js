@@ -19,4 +19,30 @@ router.post("/register", async (req, res) => {
     }
 });
 
+// Login usuario
+router.post("/login", async (req, res) => {
+    try {
+        const correo = req.body.correo || req.body.email;
+        const { password } = req.body;
+
+        const usuario = await User.findOne({ correo });
+
+        if (!usuario) {
+            return res.status(400).json({ message: "Usuario no encontrado" });
+        }
+
+        if (usuario.password !== password) {
+            return res.status(400).json({ message: "Contraseña incorrecta" });
+        }
+
+        res.json({
+            message: "Login exitoso",
+            user: usuario
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;

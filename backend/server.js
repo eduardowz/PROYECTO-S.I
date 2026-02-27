@@ -2,7 +2,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-const userRoutes = require("./routes/users"); // 👈 IMPORTANTE
+const userRoutes = require("./routes/users");
+const empresaRoutes = require("./routes/empresa");
+const adminRoutes = require("./routes/admin");
 
 const app = express();
 
@@ -11,9 +13,14 @@ app.use(express.json());
 
 // 👇 CONECTAMOS LAS RUTAS
 app.use("/api/users", userRoutes);
+app.use("/api/empresas", empresaRoutes);
+app.use("/api/admin", adminRoutes);
 
 mongoose.connect("mongodb+srv://admin:Admin2024@cluster0.aztiegb.mongodb.net/bolsa_trabajo?retryWrites=true&w=majority")
-.then(() => console.log("Conectado a MongoDB Atlas"))
+.then(() => {
+    console.log("Conectado a MongoDB Atlas");
+    console.log("Base de datos:", mongoose.connection.name);
+})
 .catch((err) => console.log(err));
 
 app.get("/", (req, res) => {
