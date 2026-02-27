@@ -1,5 +1,3 @@
-
-
 // ── LEER SESIÓN ─────────────────────────────────────
 const sesionActiva = sessionStorage.getItem("sesionActiva") || localStorage.getItem("sesionActiva");
 const usuario = sesionActiva ? JSON.parse(sesionActiva) : null;
@@ -78,7 +76,7 @@ function aplicarRol() {
   }
 }
 
-// ── CERRAR SESIÓN ────────────────────────────────────
+// ── CERRAR SESIÓN (agregue esto) ────────────────────────────────────
 document.getElementById("btnLogout").addEventListener("click", () => {
   sessionStorage.removeItem("sesionActiva");
   localStorage.removeItem("sesionActiva");
@@ -87,5 +85,9 @@ document.getElementById("btnLogout").addEventListener("click", () => {
 
 // ── INIT ─────────────────────────────────────────────
 aplicarRol();
+
+
+
+
 
 
