@@ -1,305 +1,401 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bolsa de Trabajo - Autenticación</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Bolsa de Trabajo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="home.css">
 </head>
 <body>
 
-    <!-- Fondo animado -->
-    <div class="bg-canvas">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-        <div class="orb orb-4"></div>
-        <div class="shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-            <div class="shape shape-3"></div>
-            <div class="shape shape-4"></div>
-        </div>
-        <div class="particles" id="particles"></div>
+  <aside class="menu-lateral">
+    <div>
+      <h3>BolsaTrabajo</h3>
+      <hr>
+      <div class="usuario-info solo-logueado" id="infoUsuario">
+        <span id="nombreUsuario">Usuario</span>
+        <small id="correoUsuario">correo@ejemplo.com</small>
+        <span class="badge-rol" id="badgeRol">rol</span>
+      </div>
+      <nav id="navMenu">
+        <a onclick="mostrarSeccion('inicio',this)">
+          <span class="nav-icon ni-inicio"><i class="fa-solid fa-house"></i></span> Inicio
+        </a>
+        <a onclick="mostrarSeccion('vacantes',this)">
+          <span class="nav-icon ni-vacantes"><i class="fa-solid fa-briefcase"></i></span> Vacantes
+        </a>
+        <a onclick="mostrarSeccion('empresas',this)">
+          <span class="nav-icon ni-empresas"><i class="fa-solid fa-building"></i></span> Empresas
+        </a>
+        <a onclick="mostrarSeccion('mi-cv',this)" class="solo-candidato">
+          <span class="nav-icon ni-cv"><i class="fa-solid fa-file-lines"></i></span> Mi CV
+        </a>
+        <a onclick="mostrarSeccion('mis-postulaciones',this)" class="solo-candidato">
+          <span class="nav-icon ni-postula"><i class="fa-solid fa-paper-plane"></i></span> Mis Postulaciones
+        </a>
+        <a onclick="mostrarSeccion('publicar-vacante',this)" class="solo-empresa">
+          <span class="nav-icon ni-publicar"><i class="fa-solid fa-circle-plus"></i></span> Publicar Vacante
+        </a>
+        <a onclick="mostrarSeccion('mis-vacantes',this)" class="solo-empresa">
+          <span class="nav-icon ni-misvac"><i class="fa-solid fa-folder-open"></i></span> Mis Vacantes
+        </a>
+        <a onclick="mostrarSeccion('gestionar-usuarios',this)" class="solo-admin">
+          <span class="nav-icon ni-usuarios"><i class="fa-solid fa-users-gear"></i></span> Gestionar Usuarios
+        </a>
+        <a onclick="mostrarSeccion('verificar-empresas',this)" class="solo-admin">
+          <span class="nav-icon ni-verificar"><i class="fa-solid fa-building-circle-check"></i></span> Verificar Empresas
+        </a>
+        <a onclick="mostrarSeccion('mi-perfil',this)" class="solo-logueado">
+          <span class="nav-icon ni-perfil"><i class="fa-solid fa-circle-user"></i></span> Mi Perfil
+        </a>
+      </nav>
     </div>
 
-    <!-- Topbar -->
-    <nav class="topbar">
-        <div class="brand">
-            <div class="brand-icon">
-                <svg viewBox="0 0 24 24" fill="white" width="18" height="18">
-                    <path d="M20 7H4a2 2 0 00-2 2v9a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM12 14a2 2 0 110-4 2 2 0 010 4z"/>
-                    <path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                </svg>
-            </div>
-            <div class="brand-name">
-                Bolsa de Trabajo Verificada
-                <span>Empleos seguros y confiables</span>
-            </div>
-        </div>
-        <div class="topbar-badges">
-            <span class="tbadge tbadge-teal">✓ Anti-fraude activo</span>
-            <span class="tbadge tbadge-gold">🔒 HTTPS cifrado</span>
-        </div>
-    </nav>
-
-    <!-- Página principal -->
-    <div class="page">
-        <div class="card">
-            <div class="card-accent"></div>
-            <div class="card-inner">
-
-                <!-- Tabs -->
-                <div class="tab-bar">
-                    <button class="tab-btn active" id="tabRegistroBtn">Crear Cuenta</button>
-                    <button class="tab-btn" id="tabLoginBtn">Iniciar Sesión</button>
-                </div>
-
-                <!-- REGISTRO -->
-                <form id="formRegistro" class="form-panel active">
-                    <div class="form-head">
-                        <h2>Crear Cuenta Nueva</h2>
-                        <p>Regístrate gratis y empieza a postularte hoy</p>
-                    </div>
-
-                    <div class="tipo-usuario">
-                        <p class="label-tipo">Registrarse como:</p>
-                        <div class="radio-group">
-                            <label class="radio-label">
-                                <input type="radio" name="tipoUsuario" value="candidato" checked>
-                                <span class="radio-custom"></span>
-                                <div class="radio-content"><strong>Candidato</strong><small>Buscar empleo y postularse</small></div>
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="tipoUsuario" value="empresa">
-                                <span class="radio-custom"></span>
-                                <div class="radio-content"><strong>Empresa</strong><small>Publicar vacantes verificadas</small></div>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="fields-grid">
-                        <div class="input-group full">
-                            <label for="nombreRegistro">Nombre Completo / Razón Social *</label>
-                            <input type="text" id="nombreRegistro" placeholder="Ej: Juan Pérez / Empresa S.A." required>
-                        </div>
-                        <div class="input-group">
-                            <label for="correoRegistro">Correo Electrónico *</label>
-                            <input type="email" id="correoRegistro" placeholder="correo@ejemplo.com" required>
-                        </div>
-                        <div class="input-group">
-                            <label for="telefonoRegistro">Teléfono *</label>
-                            <input type="tel" id="telefonoRegistro" placeholder="664 123 4567" required>
-                        </div>
-                    </div>
-
-                    <!-- Campos Empresa -->
-                    <div id="camposEmpresa" class="campos-especificos fields-grid" style="display:none">
-                        <div class="input-group">
-                            <label for="rfcEmpresa">RFC de la Empresa *</label>
-                            <input type="text" id="rfcEmpresa" placeholder="XAXX010101000" maxlength="13">
-                        </div>
-                        <div class="input-group">
-                            <label for="sitioWeb">Sitio Web (opcional)</label>
-                            <input type="url" id="sitioWeb" placeholder="https://www.empresa.com">
-                        </div>
-                        <div class="input-group full">
-                            <label for="direccionEmpresa">Dirección de la Empresa *</label>
-                            <input type="text" id="direccionEmpresa" placeholder="Calle, Número, Colonia, Ciudad">
-                        </div>
-                    </div>
-
-                    <!-- Campos Candidato -->
-                    <div id="camposCandidato" class="campos-especificos fields-grid">
-                        <div class="input-group">
-                            <label for="edadCandidato">Edad *</label>
-                            <input type="number" id="edadCandidato" placeholder="18" min="18" max="100">
-                        </div>
-                        <div class="input-group">
-                            <label for="ubicacionCandidato">Ciudad *</label>
-                            <input type="text" id="ubicacionCandidato" placeholder="Ej: Ciudad Juárez, Chih.">
-                        </div>
-                    </div>
-
-                    <div class="fields-grid">
-                        <div class="input-group">
-                            <label for="passwordRegistro">Contraseña *</label>
-                            <div class="pw-wrap">
-                                <input type="password" id="passwordRegistro" placeholder="Mínimo 8 caracteres" required minlength="8">
-                                <button type="button" class="toggle-pw" data-target="passwordRegistro">
-                                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                </button>
-                            </div>
-                            <small>Mayúsculas, minúsculas y números</small>
-                        </div>
-                        <div class="input-group">
-                            <label for="passwordConfirm">Confirmar Contraseña *</label>
-                            <div class="pw-wrap">
-                                <input type="password" id="passwordConfirm" placeholder="Repite tu contraseña" required>
-                                <button type="button" class="toggle-pw" data-target="passwordConfirm">
-                                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Avisos colapsables -->
-                    <div class="aviso-block">
-                        <div class="aviso-header" data-aviso>
-                            <span>Aviso de Privacidad</span>
-                            <div class="aviso-header-right">
-                                <span class="badge badge-teal">LFPDPPP</span>
-                                <svg class="chevron" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-                            </div>
-                        </div>
-                        <div class="aviso-body">
-                            <div class="aviso-body-inner aviso-privacidad">
-                                <p>Tus datos serán tratados conforme a la Ley Federal de Protección de Datos Personales, usados exclusivamente para:</p>
-                                <ul>
-                                    <li>Gestionar tu cuenta en la plataforma</li>
-                                    <li>Facilitar la búsqueda y postulación a empleos</li>
-                                    <li>Comunicación con empresas verificadas</li>
-                                    <li>Envío de notificaciones de empleo</li>
-                                </ul>
-                                <p><strong>No compartiremos tu información con terceros sin tu consentimiento.</strong></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="aviso-block">
-                        <div class="aviso-header" data-aviso>
-                            <span>Términos y Condiciones de Uso</span>
-                            <svg class="chevron" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-                        </div>
-                        <div class="aviso-body">
-                            <div class="aviso-body-inner aviso-terminos">
-                                <ul>
-                                    <li><strong>Candidatos:</strong> Información veraz y actualizada en tu perfil y CV.</li>
-                                    <li><strong>Empresas:</strong> Solo vacantes reales. Requiere proceso de verificación.</li>
-                                    <li>Prohibido el uso fraudulento o ilícito de la plataforma.</li>
-                                    <li>La plataforma puede eliminar cuentas que violen estas políticas.</li>
-                                    <li>Datos de contacto no deben usarse para spam o publicidad no autorizada.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="aviso-block">
-                        <div class="aviso-header" data-aviso>
-                            <span>Compromiso de Seguridad y Anti-Fraude</span>
-                            <div class="aviso-header-right">
-                                <span class="badge badge-gold">Verificado</span>
-                                <svg class="chevron" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-                            </div>
-                        </div>
-                        <div class="aviso-body">
-                            <div class="aviso-body-inner aviso-seguridad">
-                                <p><strong>Nuestra plataforma garantiza:</strong></p>
-                                <ul>
-                                    <li>Verificación obligatoria de empresas antes de publicar vacantes</li>
-                                    <li>Moderación de contenido y reportes de usuarios</li>
-                                    <li>Sistema de reputación y calificaciones</li>
-                                    <li>Protección de datos con cifrado HTTPS</li>
-                                    <li>Mecanismos contra bots y cuentas falsas</li>
-                                </ul>
-                                <p><strong>Reporta cualquier actividad sospechosa de inmediato.</strong></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="checkbox-group">
-                        <div class="checks-title">Consentimientos requeridos</div>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="consentimientoPrivacidad" required>
-                            <span>He leído y acepto el <strong>Aviso de Privacidad</strong> *</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="consentimientoTerminos" required>
-                            <span>Acepto los <strong>Términos y Condiciones</strong> de uso *</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="consentimientoAntiFraude" required>
-                            <span>Acepto el <strong>Compromiso Anti-Fraude</strong> y me comprometo a usar la plataforma responsablemente *</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="consentimientoNotificaciones">
-                            <span>Deseo recibir notificaciones de vacantes y alertas de seguridad (opcional)</span>
-                        </label>
-                        <label class="checkbox-label" id="checkboxVerificacionEmpresa" style="display:none">
-                            <input type="checkbox" id="consentimientoVerificacion">
-                            <span>Autorizo la <strong>verificación de mi empresa</strong> mediante documentos oficiales *</span>
-                        </label>
-                    </div>
-
-                    <button type="submit" class="btn-primary">
-                        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span id="textoBotonRegistro">Crear Cuenta como Candidato</span>
-                    </button>
-                    <p id="mensajeRegistro" class="mensaje"></p>
-                    <div class="toggle-form">
-                        <p>¿Ya tienes cuenta? <a href="#" id="irLogin">Inicia Sesión</a></p>
-                    </div>
-                </form>
-
-                <!-- LOGIN -->
-                <form id="formLogin" class="form-panel">
-                    <div class="form-head">
-                        <h2>Bienvenido de nuevo</h2>
-                        <p>Ingresa tus credenciales para continuar</p>
-                    </div>
-
-                    <div class="fields-grid">
-                        <div class="input-group full">
-                            <label for="correoLogin">Correo Electrónico</label>
-                            <input type="email" id="correoLogin" placeholder="correo@ejemplo.com" required>
-                        </div>
-                        <div class="input-group full">
-                            <label for="passwordLogin">Contraseña</label>
-                            <div class="pw-wrap">
-                                <input type="password" id="passwordLogin" placeholder="Tu contraseña" required>
-                                <button type="button" class="toggle-pw" data-target="passwordLogin">
-                                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tipo-usuario-login">
-                        <p class="label-tipo">Iniciar sesión como:</p>
-                        <div class="radio-group-inline">
-                            <label class="radio-label-inline"><input type="radio" name="tipoLogin" value="candidato" checked><span>Candidato</span></label>
-                            <label class="radio-label-inline"><input type="radio" name="tipoLogin" value="empresa"><span>Empresa</span></label>
-                            <label class="radio-label-inline"><input type="radio" name="tipoLogin" value="admin"><span>Admin</span></label>
-                        </div>
-                    </div>
-
-                    <div class="login-bottom-row">
-                        <label class="checkbox-label inline">
-                            <input type="checkbox" id="recordarme">
-                            <span>Recordar mi sesión</span>
-                        </label>
-                        <a href="#" class="recuperar-link">¿Olvidaste tu contraseña?</a>
-                    </div>
-
-                    <button type="submit" class="btn-primary">
-                        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                        Iniciar Sesión
-                    </button>
-                    <p id="mensajeLogin" class="mensaje"></p>
-                    <div class="toggle-form">
-                        <p>¿No tienes cuenta? <a href="#" id="irRegistro">Regístrate</a></p>
-                    </div>
-                </form>
-
-            </div><!-- /card-inner -->
-        </div><!-- /card -->
-
-        <div class="info-footer">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Conexión segura &nbsp;|&nbsp; Empresas verificadas &nbsp;|&nbsp; Sistema anti-fraude activo
-        </div>
+    <div style="padding: 16px 14px;">
+      <button id="btnLogout">
+        <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+      </button>
     </div>
+  </aside>
 
-    <script src="script.js"></script>
+  <main class="contenido">
+
+    <!-- INICIO -->
+    <section class="seccion activa" id="sec-inicio">
+      <div class="banner">
+        <h2 id="tituloPagina"><i class="fa-solid fa-star"></i> Bienvenido/a a BolsaTrabajo</h2>
+        <p id="subtituloPagina">Encuentra oportunidades laborales, actualiza tu perfil y conecta con empresas que buscan tu talento.</p>
+      </div>
+
+      <div id="bloque-consejos">
+        <div class="sep-titulo"><i class="fa-solid fa-lightbulb"></i> Consejos para encontrar empleo <span></span></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:28px;">
+          <div class="consejo-card">
+            <div style="padding:14px 18px 10px;display:flex;align-items:center;gap:10px;">
+              <div class="consejo-icon" style="background:#e8f8f2;"><i class="fa-solid fa-file-lines" style="color:#1a7a4a;"></i></div>
+              <span style="padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;background:#e8f8f2;color:#1a7a4a;">Consejo</span>
+            </div>
+            <div style="padding:0 18px 18px;">
+              <h4 style="font-size:14.5px;font-weight:700;color:#1a2a4a;margin-bottom:6px;">Mantén tu CV actualizado</h4>
+              <p style="font-size:13px;color:#666;line-height:1.6;">Agrega tus últimas experiencias y habilidades para aumentar tus posibilidades de ser contactado.</p>
+            </div>
+          </div>
+          <div class="consejo-card">
+            <div style="padding:14px 18px 10px;display:flex;align-items:center;gap:10px;">
+              <div class="consejo-icon" style="background:#fff4e5;"><i class="fa-solid fa-clock" style="color:#b57600;"></i></div>
+              <span style="padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;background:#fff4e5;color:#b57600;">Consejo</span>
+            </div>
+            <div style="padding:0 18px 18px;">
+              <h4 style="font-size:14.5px;font-weight:700;color:#1a2a4a;margin-bottom:6px;">Sé puntual en tus entrevistas</h4>
+              <p style="font-size:13px;color:#666;line-height:1.6;">Llegar a tiempo demuestra responsabilidad. Se recomienda llegar 10 minutos antes.</p>
+            </div>
+          </div>
+          <div class="consejo-card">
+            <div style="padding:14px 18px 10px;display:flex;align-items:center;gap:10px;">
+              <div class="consejo-icon" style="background:#e8f0fb;"><i class="fa-solid fa-magnifying-glass" style="color:#1E56A0;"></i></div>
+              <span style="padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;background:#e8f0fb;color:#1E56A0;">Consejo</span>
+            </div>
+            <div style="padding:0 18px 18px;">
+              <h4 style="font-size:14.5px;font-weight:700;color:#1a2a4a;margin-bottom:6px;">Investiga la empresa antes de aplicar</h4>
+              <p style="font-size:13px;color:#666;line-height:1.6;">Conocer a la empresa te ayuda a preparar mejores respuestas en la entrevista.</p>
+            </div>
+          </div>
+          <div class="consejo-card">
+            <div style="padding:14px 18px 10px;display:flex;align-items:center;gap:10px;">
+              <div class="consejo-icon" style="background:#fdecea;"><i class="fa-solid fa-envelope-circle-check" style="color:#c0392b;"></i></div>
+              <span style="padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;background:#fdecea;color:#c0392b;">Consejo</span>
+            </div>
+            <div style="padding:0 18px 18px;">
+              <h4 style="font-size:14.5px;font-weight:700;color:#1a2a4a;margin-bottom:6px;">Revisa tus postulaciones con frecuencia</h4>
+              <p style="font-size:13px;color:#666;line-height:1.6;">Estar pendiente te permite responder rápido si una empresa te contacta.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="bloque-empresa-inicio" style="display:none;">
+        <div class="sep-titulo"><i class="fa-solid fa-folder-open"></i> Tus vacantes publicadas <span></span></div>
+        <div class="vacante-admin"><div><h4>Desarrollador Web</h4><p>Ciudad de México · $20,000 MXN</p></div><button class="btn-eliminar">Eliminar</button></div>
+        <div class="vacante-admin"><div><h4>Diseñador UI</h4><p>Remoto · $16,000 MXN</p></div><button class="btn-eliminar">Eliminar</button></div>
+      </div>
+
+      <div id="bloque-admin-inicio" style="display:none;">
+        <div class="sep-titulo"><i class="fa-solid fa-bullhorn"></i> Recomendaciones para el administrador <span></span></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:28px;">
+          <div class="consejo-card">
+            <div style="padding:14px 18px 10px;display:flex;align-items:center;gap:10px;">
+              <div class="consejo-icon" style="background:#fdecea;"><i class="fa-solid fa-triangle-exclamation" style="color:#c0392b;"></i></div>
+              <span style="padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;background:#fdecea;color:#c0392b;">Aviso</span>
+            </div>
+            <div style="padding:0 18px 18px;">
+              <h4 style="font-size:14.5px;font-weight:700;color:#1a2a4a;margin-bottom:6px;">Empresas pendientes</h4>
+              <p style="font-size:13px;color:#666;line-height:1.6;">Hay empresas esperando verificación. Revísalas en <strong>Verificar Empresas</strong> para activarlas.</p>
+            </div>
+          </div>
+          <div class="consejo-card">
+            <div style="padding:14px 18px 10px;display:flex;align-items:center;gap:10px;">
+              <div class="consejo-icon" style="background:#e8f0fb;"><i class="fa-solid fa-users" style="color:#1E56A0;"></i></div>
+              <span style="padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;background:#e8f0fb;color:#1E56A0;">Aviso</span>
+            </div>
+            <div style="padding:0 18px 18px;">
+              <h4 style="font-size:14.5px;font-weight:700;color:#1a2a4a;margin-bottom:6px;">Nuevos usuarios</h4>
+              <p style="font-size:13px;color:#666;line-height:1.6;">Se han registrado nuevos usuarios esta semana. Gestiónalos en <strong>Gestionar Usuarios</strong>.</p>
+            </div>
+          </div>
+          <div class="consejo-card">
+            <div style="padding:14px 18px 10px;display:flex;align-items:center;gap:10px;">
+              <div class="consejo-icon" style="background:#fff4e5;"><i class="fa-solid fa-lightbulb" style="color:#b57600;"></i></div>
+              <span style="padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;background:#fff4e5;color:#b57600;">Recomendación</span>
+            </div>
+            <div style="padding:0 18px 18px;">
+              <h4 style="font-size:14.5px;font-weight:700;color:#1a2a4a;margin-bottom:6px;">Verifica empresas regularmente</h4>
+              <p style="font-size:13px;color:#666;line-height:1.6;">Mantén la calidad de la plataforma revisando y verificando las empresas registradas.</p>
+            </div>
+          </div>
+          <div class="consejo-card">
+            <div style="padding:14px 18px 10px;display:flex;align-items:center;gap:10px;">
+              <div class="consejo-icon" style="background:#e8f8f2;"><i class="fa-solid fa-star" style="color:#1a7a4a;"></i></div>
+              <span style="padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;background:#e8f8f2;color:#1a7a4a;">Recomendación</span>
+            </div>
+            <div style="padding:0 18px 18px;">
+              <h4 style="font-size:14.5px;font-weight:700;color:#1a2a4a;margin-bottom:6px;">Revisa las vacantes publicadas</h4>
+              <p style="font-size:13px;color:#666;line-height:1.6;">Asegúrate de que las vacantes cumplan los lineamientos de la plataforma periódicamente.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VACANTES -->
+    <section class="seccion" id="sec-vacantes">
+      <h2><i class="fa-solid fa-briefcase"></i> Vacantes disponibles</h2>
+      <div class="vacantes">
+        <div class="card"><h3>Desarrollador Web</h3><p><strong>Empresa:</strong> Tech Solutions</p><p><strong>Ubicación:</strong> Ciudad de México</p><p><strong>Salario:</strong> $20,000 MXN</p><button class="btn-postular">Postularme</button></div>
+        <div class="card"><h3>Diseñador Gráfico</h3><p><strong>Empresa:</strong> Creativos MX</p><p><strong>Ubicación:</strong> Guadalajara</p><p><strong>Salario:</strong> $18,000 MXN</p><button class="btn-postular">Postularme</button></div>
+        <div class="card"><h3>Auxiliar Administrativo</h3><p><strong>Empresa:</strong> Grupo Norteño</p><p><strong>Ubicación:</strong> Monterrey</p><p><strong>Salario:</strong> $15,000 MXN</p><button class="btn-postular">Postularme</button></div>
+      </div>
+    </section>
+
+    <!-- EMPRESAS -->
+    <section class="seccion" id="sec-empresas">
+      <h2><i class="fa-solid fa-building"></i> Empresas registradas</h2>
+      <div class="vacante-admin"><div><h4>Tech Solutions</h4><p>Ciudad de México · Tecnología</p></div></div>
+      <div class="vacante-admin"><div><h4>Creativos MX</h4><p>Guadalajara · Diseño</p></div></div>
+      <div class="vacante-admin"><div><h4>Grupo Norteño</h4><p>Monterrey · Administración</p></div></div>
+    </section>
+
+    <!-- MI CV -->
+    <section class="seccion" id="sec-mi-cv">
+      <h2><i class="fa-solid fa-file-lines"></i> Mi CV</h2>
+      <div class="cv-box">
+        <div class="cv-header">
+          <i class="fa-solid fa-id-card"></i>
+          <div>
+            <strong>Perfil Profesional</strong>
+            <span>Completa tu información para que las empresas puedan encontrarte</span>
+          </div>
+        </div>
+        <div class="cv-body">
+          <label><i class="fa-solid fa-user"></i> Nombre completo</label>
+          <input type="text" placeholder="Ej. Juan Pérez">
+          <label><i class="fa-solid fa-phone"></i> Teléfono</label>
+          <input type="text" placeholder="Ej. 55 1234 5678">
+          <label><i class="fa-solid fa-star"></i> Habilidades</label>
+          <textarea placeholder="Ej. HTML, CSS, JavaScript..."></textarea>
+          <label><i class="fa-solid fa-briefcase"></i> Experiencia laboral</label>
+          <textarea placeholder="Describe tu experiencia laboral..."></textarea>
+          <button class="btn-guardar"><i class="fa-solid fa-floppy-disk"></i> Guardar CV</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MIS POSTULACIONES -->
+    <section class="seccion" id="sec-mis-postulaciones">
+      <h2><i class="fa-solid fa-paper-plane"></i> Mis Postulaciones</h2>
+      <div class="postulacion-item"><div><h4>Desarrollador Web</h4><p>Tech Solutions · Ciudad de México</p></div><span class="estado-badge estado-pendiente">Pendiente</span></div>
+      <div class="postulacion-item"><div><h4>Diseñador Gráfico</h4><p>Creativos MX · Guadalajara</p></div><span class="estado-badge estado-aceptado">Aceptado</span></div>
+    </section>
+
+    <!-- PUBLICAR VACANTE -->
+    <section class="seccion" id="sec-publicar-vacante">
+      <h2><i class="fa-solid fa-circle-plus"></i> Publicar Vacante</h2>
+      <div class="form-vacante">
+        <label>Título del puesto</label><input type="text" placeholder="Ej. Desarrollador Frontend">
+        <label>Ubicación</label><input type="text" placeholder="Ej. Ciudad de México">
+        <label>Salario</label><input type="text" placeholder="Ej. $20,000 MXN">
+        <label>Tipo de contrato</label>
+        <select><option>Tiempo completo</option><option>Medio tiempo</option><option>Por proyecto</option></select>
+        <label>Descripción</label><textarea placeholder="Describe el puesto, requisitos y beneficios..."></textarea>
+        <button class="btn-guardar">Publicar Vacante</button>
+      </div>
+    </section>
+
+    <!-- MIS VACANTES -->
+    <section class="seccion" id="sec-mis-vacantes">
+      <h2><i class="fa-solid fa-folder-open"></i> Mis Vacantes</h2>
+      <div class="vacante-admin"><div><h4>Desarrollador Web</h4><p>Ciudad de México · $20,000 MXN</p></div><button class="btn-eliminar">Eliminar</button></div>
+      <div class="vacante-admin"><div><h4>Diseñador UI</h4><p>Remoto · $16,000 MXN</p></div><button class="btn-eliminar">Eliminar</button></div>
+    </section>
+
+    <!-- GESTIONAR USUARIOS -->
+    <section class="seccion" id="sec-gestionar-usuarios">
+      <h2><i class="fa-solid fa-users-gear"></i> Gestionar Usuarios</h2>
+      <table class="tabla-usuarios">
+        <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Acción</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Juan Pérez</td><td>juan@mail.com</td>
+            <td><span class="badge-rol badge-candidato">Candidato</span></td>
+            <td><button class="btn-eliminar" style="padding:5px 12px;font-size:12px;">Eliminar</button></td>
+          </tr>
+          <tr>
+            <td>Tech Solutions</td><td>tech@solutions.com</td>
+            <td><span class="badge-rol badge-empresa">Empresa</span></td>
+            <td><button class="btn-eliminar" style="padding:5px 12px;font-size:12px;">Eliminar</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- VERIFICAR EMPRESAS -->
+    <section class="seccion" id="sec-verificar-empresas">
+      <h2><i class="fa-solid fa-building-circle-check"></i> Verificar Empresas</h2>
+      <div class="empresa-item"><div><h4>Innovatech S.A.</h4><p>Registrada el 12/01/2025 · Pendiente de verificación</p></div><button class="btn-verificar">Verificar</button></div>
+      <div class="empresa-item"><div><h4>Grupo Digital MX</h4><p>Registrada el 05/02/2025 · Pendiente de verificación</p></div><button class="btn-verificar">Verificar</button></div>
+    </section>
+
+    <!-- MI PERFIL -->
+    <section class="seccion" id="sec-mi-perfil">
+      <h2><i class="fa-solid fa-circle-user"></i> Mi Perfil</h2>
+      <div class="perfil-box">
+        <div class="perfil-avatar" id="perfilAvatar">U</div>
+        <h3 id="perfilNombre">Usuario</h3>
+        <p id="perfilCorreo">correo@ejemplo.com</p>
+        <div class="dato"><strong>Rol:</strong> <span id="perfilRol">—</span></div>
+        <div class="dato"><strong>Correo:</strong> <span id="perfilCorreo2">—</span></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const sesionActiva = sessionStorage.getItem("sesionActiva") || localStorage.getItem("sesionActiva");
+    const usuario = sesionActiva ? JSON.parse(sesionActiva) : null;
+
+    function irAInicio() {
+      document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
+      document.querySelectorAll('.menu-lateral nav a').forEach(a => a.classList.remove('activo'));
+      document.getElementById('sec-inicio').classList.add('activa');
+    }
+
+    function mostrarSeccion(id, el) {
+      const soloAdmin     = ['gestionar-usuarios','verificar-empresas'];
+      const soloCandidato = ['mi-cv','mis-postulaciones'];
+      const soloEmpresa   = ['publicar-vacante','mis-vacantes'];
+
+      if (usuario) {
+        if (soloAdmin.includes(id)     && usuario.tipo !== 'admin')     { irAInicio(); return; }
+        if (soloCandidato.includes(id) && usuario.tipo !== 'candidato') { irAInicio(); return; }
+        if (soloEmpresa.includes(id)   && usuario.tipo !== 'empresa')   { irAInicio(); return; }
+      } else {
+        if (!['inicio','vacantes','empresas'].includes(id)) { irAInicio(); return; }
+      }
+
+      document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
+      document.querySelectorAll('.menu-lateral nav a').forEach(a => a.classList.remove('activo'));
+      document.getElementById('sec-' + id).classList.add('activa');
+      if (el) el.classList.add('activo');
+      if (id === 'mi-perfil') actualizarPerfil();
+    }
+
+    function actualizarPerfil() {
+      if (!usuario) return;
+      document.getElementById('perfilAvatar').textContent = usuario.nombre.charAt(0).toUpperCase();
+      document.getElementById('perfilNombre').textContent = usuario.nombre;
+      document.getElementById('perfilCorreo').textContent = usuario.correo;
+      document.getElementById('perfilRol').textContent = usuario.tipo;
+      document.getElementById('perfilCorreo2').textContent = usuario.correo;
+    }
+
+    function aplicarRol() {
+      if (!usuario) {
+        document.querySelectorAll('.solo-logueado').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.solo-candidato,.solo-empresa,.solo-admin').forEach(el => el.style.display = 'none');
+        document.getElementById('bloque-consejos').style.display = 'block';
+        document.getElementById('bloque-admin-inicio').style.display = 'none';
+        document.getElementById('bloque-empresa-inicio').style.display = 'none';
+        return;
+      }
+
+      document.querySelectorAll('.solo-logueado').forEach(el => {
+        el.style.display = el.tagName === 'A' ? 'flex' : 'block';
+      });
+      document.getElementById('nombreUsuario').textContent = usuario.nombre;
+      document.getElementById('correoUsuario').textContent = usuario.correo;
+      const badge = document.getElementById('badgeRol');
+      badge.textContent = usuario.tipo;
+      badge.className = `badge-rol badge-${usuario.tipo}`;
+
+      document.querySelectorAll('.solo-candidato').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.solo-empresa').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.solo-admin').forEach(el => el.style.display = 'none');
+      document.getElementById('bloque-consejos').style.display = 'none';
+      document.getElementById('bloque-admin-inicio').style.display = 'none';
+      document.getElementById('bloque-empresa-inicio').style.display = 'none';
+
+      if (usuario.tipo === 'candidato') {
+        document.querySelectorAll('.solo-candidato').forEach(el => {
+          el.style.display = el.tagName === 'A' ? 'flex' : 'block';
+        });
+        document.getElementById('tituloPagina').innerHTML = `<i class="fa-solid fa-user-check"></i> Bienvenido/a, ${usuario.nombre}`;
+        document.getElementById('subtituloPagina').textContent = 'Encuentra tu próxima oportunidad y postúlate a las vacantes disponibles.';
+        document.getElementById('bloque-consejos').style.display = 'block';
+        document.querySelectorAll('.btn-postular').forEach(btn => {
+          btn.addEventListener('click', e => {
+            btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Postulado';
+            btn.disabled = true;
+            btn.style.background = '#28a745';
+          });
+        });
+      }
+
+      if (usuario.tipo === 'empresa') {
+        document.querySelectorAll('.solo-empresa').forEach(el => {
+          el.style.display = el.tagName === 'A' ? 'flex' : 'block';
+        });
+        document.getElementById('tituloPagina').innerHTML = `<i class="fa-solid fa-building"></i> Bienvenido/a, ${usuario.nombre}`;
+        document.getElementById('subtituloPagina').textContent = 'Gestiona tus vacantes y encuentra al candidato ideal para tu empresa.';
+        document.getElementById('bloque-empresa-inicio').style.display = 'block';
+        document.querySelectorAll('.btn-postular').forEach(btn => {
+          btn.textContent = 'Ver Postulantes';
+          btn.style.background = '#f0a500';
+        });
+      }
+
+      if (usuario.tipo === 'admin') {
+        document.querySelectorAll('.solo-admin').forEach(el => {
+          el.style.display = el.tagName === 'A' ? 'flex' : 'block';
+        });
+        document.getElementById('tituloPagina').innerHTML = `<i class="fa-solid fa-shield-halved"></i> Panel de Administrador`;
+        document.getElementById('subtituloPagina').textContent = `Bienvenido/a, ${usuario.nombre}. Gestiona usuarios, empresas y el contenido de la plataforma.`;
+        document.getElementById('bloque-admin-inicio').style.display = 'block';
+        document.querySelectorAll('.btn-postular').forEach(btn => {
+          btn.innerHTML = '<i class="fa-solid fa-trash"></i> Eliminar Vacante';
+          btn.style.background = '#c0392b';
+        });
+      }
+    }
+
+    document.getElementById('btnLogout').addEventListener('click', () => {
+      sessionStorage.removeItem('sesionActiva');
+      localStorage.removeItem('sesionActiva');
+      window.location.href = 'login.html';
+    });
+
+    aplicarRol();
+  </script>
+
 </body>
+<script src="home.js"></script>
 </html>
