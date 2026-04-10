@@ -70,16 +70,27 @@ const recordarme          = document.getElementById("recordarme");
 const irLogin             = document.getElementById("irLogin");
 const irRegistro          = document.getElementById("irRegistro");
 const textoBotonRegistro  = document.getElementById("textoBotonRegistro");
-
 const radiosTipoUsuario   = document.querySelectorAll('input[name="tipoUsuario"]');
 
-let usuarios = JSON.parse(localStorage.getItem("usuariosBolsaTrabajo")) || [];
+
 
 // ══ VALIDACIONES ═════════════════════════════════════════
 const validarEmail    = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 const validarTelefono = (v) => /^\d{10}$/.test(v.replace(/\s/g, ""));
 const validarRFC      = (v) => /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/.test(v.toUpperCase());
 const validarPassword = (v) => /[A-Z]/.test(v) && /[a-z]/.test(v) && /\d/.test(v) && v.length >= 8;
+
+// SHA-2 
+const hashearPassword = async (password, usarSHA3 = false) => {
+    if (usarSHA3) {
+        return sha3_256(password); // SHA-3
+    } //  Web Crypto API 
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+};
 
 const mostrarMensaje = (el, texto, tipo) => {
     el.textContent = texto;
@@ -123,7 +134,7 @@ radiosTipoUsuario.forEach(radio => {
 });
 
 // ══ REGISTRO ═════════════════════════════════════════════
-formRegistro.addEventListener("submit", (e) => {
+formRegistro.addEventListener("submit", async (e) => {
     e.preventDefault();
     mensajeRegistro.style.display = "none";
 
@@ -169,11 +180,12 @@ formRegistro.addEventListener("submit", (e) => {
         return mostrarMensaje(mensajeRegistro, "Debes aceptar los Términos y Condiciones", "error");
     if (!checkAntiFraude.checked)
         return mostrarMensaje(mensajeRegistro, "Debes aceptar el Compromiso Anti-Fraude", "error");
-    if (usuarios.find(u => u.correo === correo))
-        return mostrarMensaje(mensajeRegistro, "Este correo ya está registrado", "error");
+    
+    const passwordHasheada = await hashearPassword(pass);
+
 
     const nuevoUsuario = {
-        id: Date.now(), tipo, nombre, correo, telefono, password: pass,
+        id: Date.now(), tipo, nombre, correo, telefono, password: passwordHasheada,
         aceptoPrivacidad: true, aceptoTerminos: true, aceptoAntiFraude: true,
         notificaciones: checkNotificaciones.checked,
         fechaRegistro: new Date().toLocaleString(),
@@ -183,7 +195,7 @@ formRegistro.addEventListener("submit", (e) => {
             : { edad: edadCandidato.value, ubicacion: ubicacionCandidato.value.trim(), cvSubido: false, postulaciones: [] })
     };
 
-    const ruta = tipo === "empresa"
+const ruta = tipo === "empresa"
         ? "http://localhost:3000/api/empresas/register"
         : "http://localhost:3000/api/users/register";
 
@@ -193,26 +205,31 @@ formRegistro.addEventListener("submit", (e) => {
         body: JSON.stringify(nuevoUsuario)
     })
     .then(res => res.json())
-    .then(data => console.log("Respuesta del servidor:", data))
-    .catch(err => console.log("Error al conectar con backend:", err));
-
-    usuarios.push(nuevoUsuario);
-    localStorage.setItem("usuariosBolsaTrabajo", JSON.stringify(usuarios));
-
-    const msg = tipo === "empresa"
-        ? "Registro exitoso. Tu empresa será verificada en 24-48 horas. Te notificaremos por correo."
-        : "Registro exitoso. Ya puedes iniciar sesión y comenzar a buscar empleo.";
-    mostrarMensaje(mensajeRegistro, msg, "exito");
-
-    formRegistro.reset();
-    camposEmpresa.style.display   = "none";
-    camposCandidato.style.display = "grid";
-    setTimeout(() => mostrarTab("login"), 3000);
+    .then(data => {
+        console.log("Respuesta del servidor:", data);
+        if (data.error) {
+            // El backend devuelve el error específico (incluyendo "correo ya registrado")
+            mostrarMensaje(mensajeRegistro, data.error, "error");
+        } else {
+            const msg = tipo === "empresa"
+                ? "Registro exitoso. Tu empresa será verificada en 24-48 horas. Te notificaremos por correo."
+                : "Registro exitoso. Ya puedes iniciar sesión y comenzar a buscar empleo.";
+            mostrarMensaje(mensajeRegistro, msg, "exito");
+            formRegistro.reset();
+            camposEmpresa.style.display   = "none";
+            camposCandidato.style.display = "grid";
+            setTimeout(() => mostrarTab("login"), 3000);
+        }
+    })
+    .catch(err => {
+        console.log("Error al conectar con backend:", err);
+        mostrarMensaje(mensajeRegistro, "Error al conectar con el servidor", "error");
+    });
 });
 
 
 // ══ LOGIN — detección automática de rol ══════════════════
-formLogin.addEventListener("submit", (e) => {
+formLogin.addEventListener("submit", async (e) => {
     e.preventDefault();
     mensajeLogin.style.display = "none";
 
@@ -224,11 +241,14 @@ formLogin.addEventListener("submit", (e) => {
     if (!validarEmail(correo))
         return mostrarMensaje(mensajeLogin, "El correo electrónico no es válido", "error");
 
+    //  hash SHA-2 
+    const passwordHasheada = await hashearPassword(password);
+
     // Un solo endpoint — el backend detecta el rol automáticamente
     fetch("http://localhost:3000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ correo, password })
+        body: JSON.stringify({ correo, password: passwordHasheada })
     })
     .then(res => res.json().then(data => ({ ok: res.ok, data })))
     .then(({ ok, data }) => {
@@ -262,4 +282,4 @@ if (sesionActiva) {
     console.log(`Sesión activa: ${u.nombre} (${u.tipo})`);
 }
 
-console.log(`Sistema cargado | Usuarios registrados localmente: ${usuarios.length}`);
+console.log(`Sistema cargado | Modo seguro activado`);
