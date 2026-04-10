@@ -54,7 +54,7 @@ router.put("/cv/:id", async (req, res) => {
     const usuario = await User.findByIdAndUpdate(
       req.params.id,
       { cv: { nombreCompleto, telefono, habilidades, experiencia }, cvSubido: true },
-      { new: true }
+       { returnDocument: 'after' } 
     );
     if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" });
     res.json({ message: "CV guardado correctamente", cv: usuario.cv });
