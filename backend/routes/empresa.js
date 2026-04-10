@@ -49,7 +49,7 @@ router.put("/aprobar/:id", async (req, res) => {
     const empresa = await Empresa.findByIdAndUpdate(
       req.params.id,
       { aprobada: true },
-      { new: true }
+       { returnDocument: 'after' } 
     );
     if (!empresa) return res.status(404).json({ error: "Empresa no encontrada" });
     res.json({ message: "Empresa aprobada correctamente", empresa });
