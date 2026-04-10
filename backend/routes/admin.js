@@ -72,7 +72,7 @@ router.put("/aprobar/:id", async (req, res) => {
         const empresaActualizada = await Empresa.findByIdAndUpdate(
             id,
             { aprobada: true },
-            { new: true }
+            { returnDocument: 'after' } 
         );
 
         if (!empresaActualizada) {
