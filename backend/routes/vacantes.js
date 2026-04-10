@@ -93,7 +93,7 @@ router.put("/:id", async (req, res) => {
     const vacante = await Vacante.findByIdAndUpdate(
       req.params.id,
       { titulo, ubicacion, salario, tipoContrato, descripcion },
-      { new: true }
+      { returnDocument: 'after' } 
     );
 
     if (!vacante) return res.status(404).json({ error: "Vacante no encontrada" });
