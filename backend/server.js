@@ -35,6 +35,6 @@ app.get("/", (req, res) => {
     res.send("Servidor funcionando");
 });
 
-app.listen(process.env.PORT || 3000, () => {
-    console.log("Servidor en puerto", process.env.PORT || 3000);
+app.listen(3000, () => {
+    console.log("Servidor en puerto 3000");
 });
