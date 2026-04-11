@@ -73,8 +73,6 @@ const textoBotonRegistro  = document.getElementById("textoBotonRegistro");
 
 const radiosTipoUsuario   = document.querySelectorAll('input[name="tipoUsuario"]');
 
-let usuarios = JSON.parse(localStorage.getItem("usuariosBolsaTrabajo")) || [];
-
 // ══ VALIDACIONES ═════════════════════════════════════════
 const validarEmail    = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 const validarTelefono = (v) => /^\d{10}$/.test(v.replace(/\s/g, ""));
@@ -169,49 +167,43 @@ formRegistro.addEventListener("submit", (e) => {
         return mostrarMensaje(mensajeRegistro, "Debes aceptar los Términos y Condiciones", "error");
     if (!checkAntiFraude.checked)
         return mostrarMensaje(mensajeRegistro, "Debes aceptar el Compromiso Anti-Fraude", "error");
-    if (usuarios.find(u => u.correo === correo))
-        return mostrarMensaje(mensajeRegistro, "Este correo ya está registrado", "error");
 
     const nuevoUsuario = {
-        id: Date.now(), tipo, nombre, correo, telefono, password: pass,
-        aceptoPrivacidad: true, aceptoTerminos: true, aceptoAntiFraude: true,
+        tipo, nombre, correo, telefono, password: pass,
         notificaciones: checkNotificaciones.checked,
-        fechaRegistro: new Date().toLocaleString(),
-        estado: tipo === "empresa" ? "pendiente_verificacion" : "activo",
         ...(tipo === "empresa"
-            ? { rfc: rfcEmpresa.value.trim(), sitioWeb: sitioWeb.value.trim(), direccion: direccionEmpresa.value.trim(), verificada: false, documentosVerificacion: [] }
-            : { edad: edadCandidato.value, ubicacion: ubicacionCandidato.value.trim(), cvSubido: false, postulaciones: [] })
+            ? { rfc: rfcEmpresa.value.trim(), sitioWeb: sitioWeb.value.trim(), direccion: direccionEmpresa.value.trim() }
+            : { edad: edadCandidato.value, ubicacion: ubicacionCandidato.value.trim() })
     };
 
     const ruta = tipo === "empresa"
-    ? "https://proyecto-si-production.up.railway.app/api/empresas/register"
-    : "https://proyecto-si-production.up.railway.app/api/users/register";
+        ? "https://proyecto-si-production.up.railway.app/api/empresas/register"
+        : "https://proyecto-si-production.up.railway.app/api/auth/register";
 
     fetch(ruta, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevoUsuario)
     })
-    .then(res => res.json())
-    .then(data => console.log("Respuesta del servidor:", data))
-    .catch(err => console.log("Error al conectar con backend:", err));
-
-    usuarios.push(nuevoUsuario);
-    localStorage.setItem("usuariosBolsaTrabajo", JSON.stringify(usuarios));
-
-    const msg = tipo === "empresa"
-        ? "Registro exitoso. Tu empresa será verificada en 24-48 horas. Te notificaremos por correo."
-        : "Registro exitoso. Ya puedes iniciar sesión y comenzar a buscar empleo.";
-    mostrarMensaje(mensajeRegistro, msg, "exito");
-
-    formRegistro.reset();
-    camposEmpresa.style.display   = "none";
-    camposCandidato.style.display = "grid";
-    setTimeout(() => mostrarTab("login"), 3000);
+    .then(res => res.json().then(data => ({ ok: res.ok, data })))
+    .then(({ ok, data }) => {
+        if (ok) {
+            const msg = tipo === "empresa"
+                ? "Registro exitoso. Tu empresa será verificada en 24-48 horas."
+                : "Registro exitoso. Revisa tu correo para verificar tu cuenta.";
+            mostrarMensaje(mensajeRegistro, msg, "exito");
+            formRegistro.reset();
+            camposEmpresa.style.display   = "none";
+            camposCandidato.style.display = "grid";
+            setTimeout(() => mostrarTab("login"), 3000);
+        } else {
+            mostrarMensaje(mensajeRegistro, data.error || "Error al registrarse", "error");
+        }
+    })
+    .catch(() => mostrarMensaje(mensajeRegistro, "Error al conectar con el servidor", "error"));
 });
 
-
-// ══ LOGIN — detección automática de rol ══════════════════
+// ══ LOGIN ════════════════════════════════════════════════
 formLogin.addEventListener("submit", (e) => {
     e.preventDefault();
     mensajeLogin.style.display = "none";
@@ -224,12 +216,11 @@ formLogin.addEventListener("submit", (e) => {
     if (!validarEmail(correo))
         return mostrarMensaje(mensajeLogin, "El correo electrónico no es válido", "error");
 
-   // Un solo endpoint — el backend detecta el rol automáticamente
-fetch("https://proyecto-si-production.up.railway.app/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ correo, password })
-})
+    fetch("https://proyecto-si-production.up.railway.app/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo, password })
+    })
     .then(res => res.json().then(data => ({ ok: res.ok, data })))
     .then(({ ok, data }) => {
         if (ok) {
@@ -251,7 +242,7 @@ fetch("https://proyecto-si-production.up.railway.app/api/auth/login", {
     .catch(() => mostrarMensaje(mensajeLogin, "Error al conectar con el servidor", "error"));
 });
 
-// ══ NAVEGACIÓN (links internos) ═══════════════════════════
+// ══ NAVEGACIÓN ═══════════════════════════════════════════
 irLogin.addEventListener("click",    (e) => { e.preventDefault(); mostrarTab("login"); });
 irRegistro.addEventListener("click", (e) => { e.preventDefault(); mostrarTab("registro"); });
 
@@ -262,4 +253,4 @@ if (sesionActiva) {
     console.log(`Sesión activa: ${u.nombre} (${u.tipo})`);
 }
 
-console.log(`Sistema cargado | Usuarios registrados localmente: ${usuarios.length}`);
+console.log("Sistema cargado");

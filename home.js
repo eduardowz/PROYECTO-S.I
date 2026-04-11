@@ -2,7 +2,7 @@
 //  home.js  —  Versión completa con vacantes
 // ══════════════════════════════════════════════════════════════
 
-const API = "http://localhost:3000/api";
+const API = "https://proyecto-si-production.up.railway.app/api";
 
 const sesionActiva = sessionStorage.getItem("sesionActiva") || localStorage.getItem("sesionActiva");
 const usuario = sesionActiva ? JSON.parse(sesionActiva) : null;
@@ -10,7 +10,7 @@ const usuario = sesionActiva ? JSON.parse(sesionActiva) : null;
 function cerrarSesion() {
   sessionStorage.removeItem("sesionActiva");
   localStorage.removeItem("sesionActiva");
-  window.location.href = "login.html";
+  window.location.href = "index.html";
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -217,7 +217,7 @@ async function cargarVacantes() {
 //  POSTULARSE (candidato)
 // ══════════════════════════════════════════════════════════════
 async function postularse(vacanteId, btn) {
-  if (!usuario) { window.location.href = "login.html"; return; }
+  if (!usuario) { window.location.href = "index.html"; return; }
   btn.disabled  = true;
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
 
