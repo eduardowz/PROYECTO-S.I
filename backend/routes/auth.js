@@ -23,11 +23,12 @@ router.post("/register", async (req, res) => {
         if (existe)
             return res.status(400).json({ error: "El correo ya está registrado" });
 
+        const passwordHash = await bcrypt.hash(password, 10);
         const token  = crypto.randomBytes(32).toString("hex");
         const expira = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
         const nuevoUsuario = new User({
-            nombre, correo, password, tipo, telefono, edad, ubicacion,
+            nombre, correo, password: passwordHash, tipo, telefono, edad, ubicacion,
             verificada: false,
             estado: "pendiente_verificacion",
             verificationToken: token,
@@ -116,6 +117,7 @@ router.post("/login", async (req, res) => {
             }
         }
 
+        // ── Admin ──
         let admin = await Admin.findOne({ correo });
         if (admin) {
             const passValida = await bcrypt.compare(password, admin.password);
@@ -132,18 +134,23 @@ router.post("/login", async (req, res) => {
             return res.json({ message: "Login exitoso", tipo: "admin", nombre: admin.nombre, correo: admin.correo, id: admin._id });
         }
 
+        // ── Empresa ──
         let empresa = await Empresa.findOne({ correo });
         if (empresa) {
-            if (empresa.password !== password)
+            const passValida = await bcrypt.compare(password, empresa.password);
+            if (!passValida)
                 return res.status(401).json({ error: "Credenciales incorrectas" });
             if (!empresa.aprobada)
                 return res.status(403).json({ error: "Tu cuenta está pendiente de aprobación por el administrador" });
+            delete intentosFallidos[claveIntento];
             return res.json({ message: "Login exitoso", tipo: "empresa", nombre: empresa.nombre, correo: empresa.correo, id: empresa._id.toString() });
         }
 
+        // ── Usuario/Candidato ──
         let usuario = await User.findOne({ correo });
         if (usuario) {
-            if (usuario.password !== password) {
+            const passValida = await bcrypt.compare(password, usuario.password);
+            if (!passValida) {
                 registrarIntento(claveIntento, ahora);
                 const restantes = 6 - intentosFallidos[claveIntento].contador;
                 return res.status(401).json({
