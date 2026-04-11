@@ -1,26 +1,30 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+require("dotenv").config();
 
 const userRoutes    = require("./routes/users");
 const empresaRoutes = require("./routes/empresa");
 const adminRoutes   = require("./routes/admin");
-const authRoutes    = require("./routes/auth");   // ← NUEVO
+const authRoutes    = require("./routes/auth");
 const vacanteRoutes = require("./routes/vacantes");
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: ["https://innovatalentos.tech", "https://dainty-pika-186e81.netlify.app"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+}));
 app.use(express.json());
 
-// ══ RUTAS ══════════════════════════════════════════
-app.use("/api/users",   userRoutes);
+app.use("/api/users",    userRoutes);
 app.use("/api/empresas", empresaRoutes);
-app.use("/api/admin",   adminRoutes);
-app.use("/api/auth",    authRoutes);
-app.use("/api/vacantes", vacanteRoutes);  // ← NUEVO
+app.use("/api/admin",    adminRoutes);
+app.use("/api/auth",     authRoutes);
+app.use("/api/vacantes", vacanteRoutes);
 
-mongoose.connect("mongodb+srv://admin:Admin2024@cluster0.aztiegb.mongodb.net/bolsa_trabajo?retryWrites=true&w=majority")
+mongoose.connect(process.env.MONGODB_URI)
 .then(() => {
     console.log("Conectado a MongoDB Atlas");
     console.log("Base de datos:", mongoose.connection.name);
@@ -31,6 +35,6 @@ app.get("/", (req, res) => {
     res.send("Servidor funcionando");
 });
 
-app.listen(3000, () => {
-    console.log("Servidor en puerto 3000");
+app.listen(process.env.PORT || 3000, () => {
+    console.log("Servidor en puerto", process.env.PORT || 3000);
 });

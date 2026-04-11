@@ -184,8 +184,8 @@ formRegistro.addEventListener("submit", (e) => {
     };
 
     const ruta = tipo === "empresa"
-    ? "https://proyecto-si-production.up.railway.app/api/empresas/register"
-    : "https://proyecto-si-production.up.railway.app/api/users/register";
+        ? "http://localhost:3000/api/empresas/register"
+        : "http://localhost:3000/api/users/register";
 
     fetch(ruta, {
         method: "POST",
@@ -224,12 +224,12 @@ formLogin.addEventListener("submit", (e) => {
     if (!validarEmail(correo))
         return mostrarMensaje(mensajeLogin, "El correo electrónico no es válido", "error");
 
-   // Un solo endpoint — el backend detecta el rol automáticamente
-fetch("https://proyecto-si-production.up.railway.app/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ correo, password })
-})
+    // Un solo endpoint — el backend detecta el rol automáticamente
+    fetch("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo, password })
+    })
     .then(res => res.json().then(data => ({ ok: res.ok, data })))
     .then(({ ok, data }) => {
         if (ok) {
