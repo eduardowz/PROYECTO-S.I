@@ -8,8 +8,16 @@
   <link rel="stylesheet" href="home.css">
 </head>
 <body>
- 
-  <aside class="menu-lateral">
+
+  <!-- Botón hamburguesa -->
+  <button class="hamburger" id="hamburger" aria-label="Abrir menú">
+    <span></span><span></span><span></span>
+  </button>
+
+  <!-- Overlay oscuro -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="menu-lateral" id="menuLateral">
     <div>
       <h3>BolsaTrabajo</h3>
       <hr>
@@ -57,17 +65,16 @@
       </button>
     </div>
   </aside>
- 
+
   <main class="contenido">
- 
-    <!-- ══ INICIO ══════════════════════════════════════════════ -->
+
+    <!-- ══ INICIO ══ -->
     <section class="seccion activa" id="sec-inicio">
       <div class="banner">
         <h2 id="tituloPagina"><i class="fa-solid fa-star"></i> Bienvenido/a a BolsaTrabajo</h2>
         <p id="subtituloPagina">Encuentra oportunidades laborales, actualiza tu perfil y conecta con empresas.</p>
       </div>
- 
-      <!-- Consejos candidato / invitado -->
+
       <div id="bloque-consejos">
         <div class="sep-titulo"><i class="fa-solid fa-lightbulb"></i> Consejos para encontrar empleo <span></span></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:28px;">
@@ -113,16 +120,14 @@
           </div>
         </div>
       </div>
- 
-      <!-- Bloque empresa — vacantes en vivo desde BD -->
+
       <div id="bloque-empresa-inicio" style="display:none;">
         <div class="sep-titulo"><i class="fa-solid fa-folder-open"></i> Tus vacantes publicadas <span></span></div>
         <div id="lista-vacantes-inicio-empresa">
           <p style="color:#888;font-size:13px;">Cargando...</p>
         </div>
       </div>
- 
-      <!-- Bloque admin -->
+
       <div id="bloque-admin-inicio" style="display:none;">
         <div class="sep-titulo"><i class="fa-solid fa-bullhorn"></i> Recomendaciones para el administrador <span></span></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:28px;">
@@ -169,24 +174,24 @@
         </div>
       </div>
     </section>
- 
-    <!-- ══ VACANTES — datos en vivo desde MongoDB ══════════════ -->
+
+    <!-- ══ VACANTES ══ -->
     <section class="seccion" id="sec-vacantes">
       <h2><i class="fa-solid fa-briefcase"></i> Vacantes disponibles</h2>
       <div id="lista-vacantes">
         <p style="color:#888;padding:16px;"><i class="fa-solid fa-spinner fa-spin"></i> Cargando vacantes...</p>
       </div>
     </section>
- 
-    <!-- ══ EMPRESAS — datos en vivo desde MongoDB ═════════════ -->
+
+    <!-- ══ EMPRESAS con Google Maps ══ -->
     <section class="seccion" id="sec-empresas">
       <h2><i class="fa-solid fa-building"></i> Empresas registradas</h2>
       <div id="lista-empresas">
         <p style="color:#888;padding:16px;"><i class="fa-solid fa-spinner fa-spin"></i> Cargando empresas...</p>
       </div>
     </section>
- 
-    <!-- ══ MI CV ═══════════════════════════════════════════════ -->
+
+    <!-- ══ MI CV ══ -->
     <section class="seccion" id="sec-mi-cv">
       <h2><i class="fa-solid fa-file-lines"></i> Mi CV</h2>
       <div class="cv-box">
@@ -209,27 +214,24 @@
         </div>
       </div>
     </section>
- 
-    <!-- ══ MIS POSTULACIONES ═══════════════════════════════════ -->
+
+    <!-- ══ MIS POSTULACIONES ══ -->
     <section class="seccion" id="sec-mis-postulaciones">
       <h2><i class="fa-solid fa-paper-plane"></i> Mis Postulaciones</h2>
       <p style="color:#888;padding:16px;">Aquí aparecerán las vacantes a las que te hayas postulado.</p>
     </section>
- 
-    <!-- ══ PUBLICAR VACANTE — conectado a MongoDB ═════════════ -->
+
+    <!-- ══ PUBLICAR VACANTE ══ -->
     <section class="seccion" id="sec-publicar-vacante">
       <h2><i class="fa-solid fa-circle-plus"></i> Publicar Vacante</h2>
       <div class="form-vacante">
         <form id="form-publicar-vacante">
           <label>Título del puesto *</label>
           <input type="text" id="inp-titulo" placeholder="Ej. Desarrollador Frontend" required>
- 
           <label>Ubicación *</label>
           <input type="text" id="inp-ubicacion" placeholder="Ej. Ciudad Juárez, Chih." required>
- 
           <label>Salario *</label>
           <input type="text" id="inp-salario" placeholder="Ej. $20,000 MXN" required>
- 
           <label>Tipo de contrato</label>
           <select id="inp-contrato">
             <option>Tiempo completo</option>
@@ -237,26 +239,24 @@
             <option>Por proyecto</option>
             <option>Freelance</option>
           </select>
- 
           <label>Descripción *</label>
           <textarea id="inp-descripcion" placeholder="Describe el puesto, requisitos y beneficios..." required></textarea>
- 
           <button type="submit" class="btn-guardar" id="btn-publicar-vacante">
             <i class="fa-solid fa-circle-plus"></i> Publicar Vacante
           </button>
         </form>
       </div>
     </section>
- 
-    <!-- ══ MIS VACANTES — datos en vivo desde MongoDB ═════════ -->
+
+    <!-- ══ MIS VACANTES ══ -->
     <section class="seccion" id="sec-mis-vacantes">
       <h2><i class="fa-solid fa-folder-open"></i> Mis Vacantes</h2>
       <div id="lista-mis-vacantes">
         <p style="color:#888;padding:16px;"><i class="fa-solid fa-spinner fa-spin"></i> Cargando tus vacantes...</p>
       </div>
     </section>
- 
-    <!-- ══ GESTIONAR USUARIOS — datos en vivo desde MongoDB ════ -->
+
+    <!-- ══ GESTIONAR USUARIOS ══ -->
     <section class="seccion" id="sec-gestionar-usuarios">
       <h2><i class="fa-solid fa-users-gear"></i> Gestionar Usuarios</h2>
       <table class="tabla-usuarios">
@@ -268,16 +268,16 @@
         </tbody>
       </table>
     </section>
- 
-    <!-- ══ VERIFICAR EMPRESAS — datos en vivo desde MongoDB ════ -->
+
+    <!-- ══ VERIFICAR EMPRESAS ══ -->
     <section class="seccion" id="sec-verificar-empresas">
       <h2><i class="fa-solid fa-building-circle-check"></i> Dar de alta a empresas</h2>
       <div id="lista-empresas-pendientes">
         <p style="color:#888;padding:16px;"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>
       </div>
     </section>
- 
-    <!-- ══ MI PERFIL ═══════════════════════════════════════════ -->
+
+    <!-- ══ MI PERFIL ══ -->
     <section class="seccion" id="sec-mi-perfil">
       <h2><i class="fa-solid fa-circle-user"></i> Mi Perfil</h2>
       <div class="perfil-box">
@@ -288,9 +288,9 @@
         <div class="dato"><strong>Correo:</strong> <span id="perfilCorreo2">—</span></div>
       </div>
     </section>
- 
+
   </main>
- 
+
   <script src="home.js"></script>
 </body>
 </html>

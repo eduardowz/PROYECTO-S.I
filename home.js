@@ -1,5 +1,7 @@
 // ══════════════════════════════════════════════════════════════
-//  home.js  —  Versión completa con vacantes
+//  home.js  —  Versión fusionada completa
+//  Incluye: hamburguesa, Google Maps, animaciones modal CV,
+//           tabla postulantes responsive, toast responsive
 // ══════════════════════════════════════════════════════════════
 
 const API = "https://proyecto-si-production.up.railway.app/api";
@@ -11,6 +13,38 @@ function cerrarSesion() {
   sessionStorage.removeItem("sesionActiva");
   localStorage.removeItem("sesionActiva");
   window.location.href = "index.html";
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MENÚ HAMBURGUESA
+// ══════════════════════════════════════════════════════════════
+function initHamburger() {
+  const hamburger   = document.getElementById("hamburger");
+  const menuLateral = document.getElementById("menuLateral");
+  const overlay     = document.getElementById("sidebarOverlay");
+
+  if (!hamburger) return;
+
+  hamburger.addEventListener("click", () => {
+    const abierto = menuLateral.classList.toggle("abierto");
+    hamburger.classList.toggle("open", abierto);
+    overlay.classList.toggle("visible", abierto);
+  });
+
+  overlay.addEventListener("click", cerrarMenu);
+
+  // Cerrar al hacer click en un enlace del menú en móvil
+  document.querySelectorAll(".menu-lateral nav a").forEach(a => {
+    a.addEventListener("click", () => {
+      if (window.innerWidth <= 768) cerrarMenu();
+    });
+  });
+}
+
+function cerrarMenu() {
+  document.getElementById("menuLateral")?.classList.remove("abierto");
+  document.getElementById("hamburger")?.classList.remove("open");
+  document.getElementById("sidebarOverlay")?.classList.remove("visible");
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -95,7 +129,6 @@ function aplicarRol() {
   document.querySelectorAll(".solo-empresa").forEach(el   => el.style.display = "none");
   document.querySelectorAll(".solo-admin").forEach(el     => el.style.display = "none");
 
-  // ── CANDIDATO ────────────────────────────────────────────
   if (usuario.tipo === "candidato") {
     document.querySelectorAll(".solo-candidato").forEach(el => {
       el.style.display = el.tagName === "A" ? "flex" : "block";
@@ -107,14 +140,11 @@ function aplicarRol() {
     document.getElementById("bloque-consejos").style.display = "block";
   }
 
-  // ── EMPRESA ──────────────────────────────────────────────
   if (usuario.tipo === "empresa") {
     document.querySelectorAll(".solo-empresa").forEach(el => {
       el.style.display = el.tagName === "A" ? "flex" : "block";
     });
-
     document.querySelector('[onclick*="mostrarSeccion(\'empresas\'"]')?.style.setProperty("display", "none", "important");
-
     document.getElementById("tituloPagina").innerHTML =
       `<i class="fa-solid fa-building"></i> Bienvenido/a, ${usuario.nombre}`;
     document.getElementById("subtituloPagina").textContent =
@@ -123,7 +153,6 @@ function aplicarRol() {
     cargarVacantesEmpresaInicio();
   }
 
-  // ── ADMIN ────────────────────────────────────────────────
   if (usuario.tipo === "admin") {
     document.querySelectorAll(".solo-admin").forEach(el => {
       el.style.display = el.tagName === "A" ? "flex" : "block";
@@ -149,7 +178,7 @@ function actualizarPerfil() {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  VACANTES PÚBLICAS — "Vacantes disponibles"
+//  VACANTES PÚBLICAS
 // ══════════════════════════════════════════════════════════════
 async function cargarVacantes() {
   const contenedor = document.getElementById("lista-vacantes");
@@ -209,12 +238,11 @@ async function cargarVacantes() {
 
   } catch (err) {
     contenedor.innerHTML = `<p style="color:#c0392b;padding:16px;"><i class="fa-solid fa-triangle-exclamation"></i> Error al cargar vacantes.</p>`;
-    console.error(err);
   }
 }
 
 // ══════════════════════════════════════════════════════════════
-//  POSTULARSE (candidato)
+//  POSTULARSE
 // ══════════════════════════════════════════════════════════════
 async function postularse(vacanteId, btn) {
   if (!usuario) { window.location.href = "index.html"; return; }
@@ -239,7 +267,6 @@ async function postularse(vacanteId, btn) {
       btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Postularme';
       mostrarToast(data.error || "Error al postularse", "error");
     }
-
   } catch (err) {
     btn.disabled  = false;
     btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Postularme';
@@ -248,7 +275,7 @@ async function postularse(vacanteId, btn) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  EDITAR VACANTE (empresa)
+//  EDITAR VACANTE
 // ══════════════════════════════════════════════════════════════
 async function editarVacante(id, titulo, ubicacion, salario, contrato, descripcion) {
   const card = document.getElementById(`vac-pub-${id}`);
@@ -307,7 +334,6 @@ async function guardarEdicionVacante(id) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ titulo, ubicacion, salario, tipoContrato: contrato, descripcion })
     });
-
     if (res.ok) {
       mostrarToast("✅ Vacante actualizada correctamente", "exito");
       cargarVacantes();
@@ -320,7 +346,7 @@ async function guardarEdicionVacante(id) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  PUBLICAR VACANTE (empresa)
+//  PUBLICAR VACANTE
 // ══════════════════════════════════════════════════════════════
 async function publicarVacante(e) {
   e.preventDefault();
@@ -366,7 +392,7 @@ async function publicarVacante(e) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  MIS VACANTES — empresa con postulantes
+//  MIS VACANTES
 // ══════════════════════════════════════════════════════════════
 async function cargarMisVacantes() {
   const contenedor = document.getElementById("lista-mis-vacantes");
@@ -413,7 +439,6 @@ async function cargarMisVacantes() {
 
   } catch (err) {
     contenedor.innerHTML = `<p style="color:#c0392b;padding:16px;">Error al cargar tus vacantes.</p>`;
-    console.error(err);
   }
 }
 
@@ -440,31 +465,33 @@ async function verPostulantes(vacanteId, titulo) {
         <p style="font-size:13px;font-weight:600;color:#1a2a4a;margin-bottom:8px;">
           <i class="fa-solid fa-users"></i> Postulantes para "${titulo}":
         </p>
-        <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <thead>
-            <tr style="background:#f0f4fa;">
-              <th style="padding:8px 12px;text-align:left;">Nombre</th>
-              <th style="padding:8px 12px;text-align:left;">Correo</th>
-              <th style="padding:8px 12px;text-align:left;">Fecha</th>
-              <th style="padding:8px 12px;text-align:left;">CV</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${data.postulantes.map(p => `
-              <tr style="border-bottom:1px solid #e0e6ef;">
-                <td style="padding:8px 12px;">${p.nombre}</td>
-                <td style="padding:8px 12px;"><a href="mailto:${p.correo}" style="color:#1E56A0;">${p.correo}</a></td>
-                <td style="padding:8px 12px;color:#888;">${new Date(p.fechaPostulacion).toLocaleDateString("es-MX")}</td>
-                <td style="padding:8px 12px;">
-                  <button onclick="verCVCandidato('${p.candidatoId}')"
-                    style="background:#1a7a4a;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">
-                    <i class="fa-solid fa-file-lines"></i> Ver CV
-                  </button>
-                </td>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:400px;">
+            <thead>
+              <tr style="background:#f0f4fa;">
+                <th style="padding:8px 12px;text-align:left;">Nombre</th>
+                <th style="padding:8px 12px;text-align:left;">Correo</th>
+                <th style="padding:8px 12px;text-align:left;">Fecha</th>
+                <th style="padding:8px 12px;text-align:left;">CV</th>
               </tr>
-            `).join("")}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              ${data.postulantes.map(p => `
+                <tr style="border-bottom:1px solid #e0e6ef;">
+                  <td style="padding:8px 12px;">${p.nombre}</td>
+                  <td style="padding:8px 12px;"><a href="mailto:${p.correo}" style="color:#1E56A0;">${p.correo}</a></td>
+                  <td style="padding:8px 12px;color:#888;">${new Date(p.fechaPostulacion).toLocaleDateString("es-MX")}</td>
+                  <td style="padding:8px 12px;">
+                    <button onclick="verCVCandidato('${p.candidatoId}')"
+                      style="background:#1a7a4a;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">
+                      <i class="fa-solid fa-file-lines"></i> Ver CV
+                    </button>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
       </div>`;
 
   } catch (err) {
@@ -504,7 +531,7 @@ async function cargarVacantesEmpresaInicio() {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  EMPRESAS APROBADAS
+//  EMPRESAS APROBADAS + GOOGLE MAPS
 // ══════════════════════════════════════════════════════════════
 async function cargarEmpresasAprobadas() {
   const contenedor = document.getElementById("lista-empresas");
@@ -516,21 +543,55 @@ async function cargarEmpresasAprobadas() {
     const empresas = await res.json();
     if (!empresas.length) { contenedor.innerHTML = `<p style="color:#888;padding:16px;">No hay empresas registradas aún.</p>`; return; }
     const esAdmin = usuario?.tipo === "admin";
-    contenedor.innerHTML = empresas.map(emp => `
-      <div class="vacante-admin" id="empresa-aprobada-${emp._id}">
-        <div>
-          <h4>${emp.nombre}</h4>
-          <p>${emp.direccion || "Sin dirección"} · <a href="mailto:${emp.correo}" style="color:#1E56A0;">${emp.correo}</a></p>
-          ${emp.telefono ? `<small style="color:#888;">Tel: ${emp.telefono}</small>` : ""}
+    contenedor.innerHTML = empresas.map(emp => {
+      const direccion = emp.direccion || "";
+      const mapsQuery = encodeURIComponent(direccion || emp.nombre);
+      return `
+        <div class="empresa-card" id="empresa-aprobada-${emp._id}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+            <div>
+              <h4>${emp.nombre} <span class="badge-verificada"><i class="fa-solid fa-circle-check"></i> Verificada</span></h4>
+              <p class="emp-info"><a href="mailto:${emp.correo}" style="color:#1E56A0;">${emp.correo}</a></p>
+              ${emp.telefono ? `<p class="emp-info"><i class="fa-solid fa-phone" style="color:#888;font-size:11px;"></i> ${emp.telefono}</p>` : ""}
+              ${direccion ? `
+                <button class="empresa-direccion-link" onclick="abrirGoogleMaps('${mapsQuery}')">
+                  <i class="fa-solid fa-location-dot"></i> ${direccion}
+                </button>
+                <br>
+                <button class="btn-ver-mapa" onclick="toggleMapa('mapa-${emp._id}', '${mapsQuery}')">
+                  <i class="fa-solid fa-map"></i> Ver en mapa
+                </button>
+                <div class="mapa-container" id="mapa-${emp._id}"></div>
+              ` : `<p class="emp-info" style="color:#aaa;font-style:italic;">Sin dirección registrada</p>`}
+            </div>
+            ${esAdmin ? `
+              <button class="btn-eliminar" style="padding:8px 14px;font-size:13px;"
+                      onclick="darDeBajaEmpresa('${emp._id}', '${emp.nombre}')">
+                <i class="fa-solid fa-building-circle-xmark"></i> Dar de baja
+              </button>` : ""}
+          </div>
         </div>
-        ${esAdmin ? `
-          <button class="btn-eliminar" style="padding:8px 14px;font-size:13px;"
-                  onclick="darDeBajaEmpresa('${emp._id}', '${emp.nombre}')">
-            <i class="fa-solid fa-building-circle-xmark"></i> Dar de baja
-          </button>` : ""}
-      </div>
-    `).join("");
+      `;
+    }).join("");
   } catch (err) { contenedor.innerHTML = `<p style="color:#c0392b;padding:16px;">Error al cargar empresas.</p>`; }
+}
+
+function abrirGoogleMaps(query) {
+  window.open(`https://www.google.com/maps/search/${query}`, "_blank");
+}
+
+function toggleMapa(mapaId, query) {
+  const div = document.getElementById(mapaId);
+  if (!div) return;
+
+  if (div.classList.contains("visible")) {
+    div.classList.remove("visible");
+    div.innerHTML = "";
+    return;
+  }
+
+  div.classList.add("visible");
+  div.innerHTML = `<iframe src="https://www.google.com/maps?q=${query}&output=embed" allowfullscreen></iframe>`;
 }
 
 async function darDeBajaEmpresa(id, nombre) {
@@ -689,7 +750,7 @@ async function guardarCV() {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  VER CV CANDIDATO — Modal mejorado ✨
+//  VER CV CANDIDATO — Modal con animaciones
 // ══════════════════════════════════════════════════════════════
 async function verCVCandidato(candidatoId) {
   try {
@@ -701,32 +762,23 @@ async function verCVCandidato(candidatoId) {
       return;
     }
 
-    // Iniciales para el avatar
     const nombreCompleto = data.cv.nombreCompleto || data.nombre || "?";
     const iniciales = nombreCompleto.split(" ").slice(0, 2).map(p => p[0].toUpperCase()).join("");
 
-    // Habilidades como chips (separadas por coma o salto de línea)
     const habilidadesRaw = data.cv.habilidades || "";
     const habilidadesArr = habilidadesRaw
       ? habilidadesRaw.split(/,|\n/).map(h => h.trim()).filter(h => h.length > 0)
       : [];
     const habilidadesHTML = habilidadesArr.length
       ? habilidadesArr.map(h => `
-          <span style="
-            background:#e8f0fb; color:#1E56A0;
-            font-size:12px; font-weight:600;
-            padding:4px 12px; border-radius:20px;
-            display:inline-block;">
-            ${h}
-          </span>`).join("")
+          <span style="background:#e8f0fb;color:#1E56A0;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;display:inline-block;">${h}</span>`).join("")
       : `<span style="font-size:13px;color:#999;font-style:italic;">Sin habilidades registradas.</span>`;
 
-    // Experiencia
     const experienciaHTML = data.cv.experiencia
       ? `<p style="font-size:13.5px;color:#444;line-height:1.7;margin:0;white-space:pre-wrap;">${data.cv.experiencia}</p>`
       : `<p style="font-size:13px;color:#999;font-style:italic;margin:0;">Sin experiencia registrada.</p>`;
 
-    // Insertar estilos del modal una sola vez
+    // Inyectar animaciones CSS solo una vez
     if (!document.getElementById("modal-cv-styles")) {
       const style = document.createElement("style");
       style.id = "modal-cv-styles";
@@ -741,7 +793,7 @@ async function verCVCandidato(candidatoId) {
           from { transform: translateY(20px); opacity: 0; }
           to   { transform: translateY(0);    opacity: 1; }
         }
-        #modal-cv .cv-close-btn:hover { background: rgba(255,255,255,0.25) !important; }
+        #modal-cv .cv-close-btn:hover  { background: rgba(255,255,255,0.25) !important; }
         #modal-cv .cv-action-btn:hover { background: #0d1f4a !important; }
         #modal-cv .cv-cancel-btn:hover { background: #e8ecf3 !important; }
       `;
@@ -750,156 +802,69 @@ async function verCVCandidato(candidatoId) {
 
     const modal = document.createElement("div");
     modal.id = "modal-cv";
-    modal.style.cssText = `
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(10,20,50,0.55); backdrop-filter: blur(4px);
-      z-index: 9999; display: flex; align-items: center; justify-content: center;
-      padding: 20px;
-    `;
+    modal.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,20,50,0.55);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;`;
 
     modal.innerHTML = `
-      <div class="cv-inner" style="
-        background: #fff; border-radius: 18px;
-        width: 100%; max-width: 500px;
-        box-shadow: 0 24px 60px rgba(10,20,50,0.25);
-        overflow: hidden; position: relative;
-      ">
+      <div class="cv-inner" style="background:#fff;border-radius:18px;width:100%;max-width:500px;box-shadow:0 24px 60px rgba(10,20,50,0.25);overflow:hidden;position:relative;">
 
-        <!-- ── HEADER ── -->
-        <div style="
-          background: linear-gradient(135deg, #0d1f4a 0%, #163172 50%, #1E56A0 100%);
-          padding: 26px 28px 22px; position: relative;
-        ">
-          <!-- Círculo decorativo -->
-          <div style="
-            position:absolute; top:-30px; right:-30px;
-            width:120px; height:120px; border-radius:50%;
-            background:rgba(255,255,255,0.06); pointer-events:none;
-          "></div>
-
-          <!-- Botón cerrar -->
-          <button class="cv-close-btn" onclick="document.getElementById('modal-cv').remove()" style="
-            position: absolute; top: 14px; right: 14px;
-            background: rgba(255,255,255,0.15); border: none; color: white;
-            width: 30px; height: 30px; border-radius: 50%;
-            cursor: pointer; font-size: 16px; display: flex;
-            align-items: center; justify-content: center;
-            transition: background 0.2s; line-height: 1;
-          ">✕</button>
-
-          <!-- Avatar + nombre -->
-          <div style="display: flex; align-items: center; gap: 16px;">
-            <div style="
-              width: 58px; height: 58px; border-radius: 50%;
-              background: rgba(255,255,255,0.18);
-              border: 2px solid rgba(255,255,255,0.3);
-              display: flex; align-items: center; justify-content: center;
-              font-size: 20px; font-weight: 700; color: white;
-              flex-shrink: 0; letter-spacing: 1px;
-            ">${iniciales}</div>
+        <div style="background:linear-gradient(135deg,#0d1f4a 0%,#163172 50%,#1E56A0 100%);padding:26px 28px 22px;position:relative;">
+          <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>
+          <button class="cv-close-btn" onclick="document.getElementById('modal-cv').remove()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.15);border:none;color:white;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background 0.2s;line-height:1;">✕</button>
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div style="width:58px;height:58px;border-radius:50%;background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:white;flex-shrink:0;letter-spacing:1px;">${iniciales}</div>
             <div>
-              <p style="font-size: 17px; font-weight: 700; color: white; margin: 0 0 3px;">${nombreCompleto}</p>
-              <div style="display:flex; align-items:center; gap:6px;">
-                <span style="
-                  background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9);
-                  font-size: 11px; font-weight: 600; padding: 2px 10px;
-                  border-radius: 20px; text-transform: uppercase; letter-spacing: 0.6px;
-                ">Candidato</span>
-              </div>
+              <p style="font-size:17px;font-weight:700;color:white;margin:0 0 3px;">${nombreCompleto}</p>
+              <span style="background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.9);font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.6px;">Candidato</span>
             </div>
           </div>
         </div>
 
-        <!-- ── DATOS DE CONTACTO ── -->
-        <div style="
-          display: grid; grid-template-columns: 1fr 1fr;
-          border-bottom: 1px solid #edf0f7;
-        ">
-          <div style="padding: 14px 20px; border-right: 1px solid #edf0f7;">
-            <p style="font-size: 10.5px; color: #999; margin: 0 0 3px; text-transform: uppercase; letter-spacing: 0.7px; font-weight: 600;">Teléfono</p>
-            <p style="font-size: 14px; color: #1a2a4a; margin: 0; font-weight: 600;">
-              <i class="fa-solid fa-phone" style="color:#1E56A0;font-size:11px;margin-right:4px;"></i>
-              ${data.cv.telefono || "—"}
+        <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #edf0f7;">
+          <div style="padding:14px 20px;border-right:1px solid #edf0f7;">
+            <p style="font-size:10.5px;color:#999;margin:0 0 3px;text-transform:uppercase;letter-spacing:0.7px;font-weight:600;">Teléfono</p>
+            <p style="font-size:14px;color:#1a2a4a;margin:0;font-weight:600;">
+              <i class="fa-solid fa-phone" style="color:#1E56A0;font-size:11px;margin-right:4px;"></i>${data.cv.telefono || "—"}
             </p>
           </div>
-          <div style="padding: 14px 20px;">
-            <p style="font-size: 10.5px; color: #999; margin: 0 0 3px; text-transform: uppercase; letter-spacing: 0.7px; font-weight: 600;">Correo</p>
-            <p style="font-size: 13px; color: #1E56A0; margin: 0; font-weight: 600; word-break: break-all;">
-              <i class="fa-solid fa-envelope" style="font-size:11px;margin-right:4px;"></i>
-              ${data.correo || "—"}
+          <div style="padding:14px 20px;">
+            <p style="font-size:10.5px;color:#999;margin:0 0 3px;text-transform:uppercase;letter-spacing:0.7px;font-weight:600;">Correo</p>
+            <p style="font-size:13px;color:#1E56A0;margin:0;font-weight:600;word-break:break-all;">
+              <i class="fa-solid fa-envelope" style="font-size:11px;margin-right:4px;"></i>${data.correo || "—"}
             </p>
           </div>
         </div>
 
-        <!-- ── CUERPO ── -->
-        <div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 18px;">
-
-          <!-- Habilidades -->
+        <div style="padding:20px 24px;display:flex;flex-direction:column;gap:18px;">
           <div>
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-              <div style="width:4px; height:16px; background:#1E56A0; border-radius:2px;"></div>
-              <p style="font-size:11px; font-weight:700; color:#888; margin:0; text-transform:uppercase; letter-spacing:0.8px;">Habilidades</p>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <div style="width:4px;height:16px;background:#1E56A0;border-radius:2px;"></div>
+              <p style="font-size:11px;font-weight:700;color:#888;margin:0;text-transform:uppercase;letter-spacing:0.8px;">Habilidades</p>
             </div>
-            <div style="display: flex; flex-wrap: wrap; gap: 7px;">
-              ${habilidadesHTML}
-            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:7px;">${habilidadesHTML}</div>
           </div>
-
-          <!-- Separador -->
-          <div style="border-top: 1px solid #edf0f7;"></div>
-
-          <!-- Experiencia -->
+          <div style="border-top:1px solid #edf0f7;"></div>
           <div>
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-              <div style="width:4px; height:16px; background:#1a7a4a; border-radius:2px;"></div>
-              <p style="font-size:11px; font-weight:700; color:#888; margin:0; text-transform:uppercase; letter-spacing:0.8px;">Experiencia laboral</p>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <div style="width:4px;height:16px;background:#1a7a4a;border-radius:2px;"></div>
+              <p style="font-size:11px;font-weight:700;color:#888;margin:0;text-transform:uppercase;letter-spacing:0.8px;">Experiencia laboral</p>
             </div>
-            <div style="
-              background: #f6f8fd; border-radius: 10px;
-              padding: 14px 16px; border: 1px solid #e8edf6;
-            ">
-              ${experienciaHTML}
-            </div>
+            <div style="background:#f6f8fd;border-radius:10px;padding:14px 16px;border:1px solid #e8edf6;">${experienciaHTML}</div>
           </div>
         </div>
 
-        <!-- ── FOOTER ── -->
-        <div style="
-          padding: 14px 24px 18px;
-          border-top: 1px solid #edf0f7;
-          display: flex; justify-content: flex-end; gap: 10px;
-          background: #f9fbff;
-        ">
-          <button class="cv-cancel-btn" onclick="document.getElementById('modal-cv').remove()" style="
-            padding: 9px 20px; border-radius: 8px;
-            border: 1px solid #d0daea; background: white;
-            color: #555; font-size: 13px; font-weight: 600;
-            font-family: inherit; cursor: pointer;
-            transition: background 0.2s;
-          ">Cerrar</button>
+        <div style="padding:14px 24px 18px;border-top:1px solid #edf0f7;display:flex;justify-content:flex-end;gap:10px;background:#f9fbff;">
+          <button class="cv-cancel-btn" onclick="document.getElementById('modal-cv').remove()" style="padding:9px 20px;border-radius:8px;border:1px solid #d0daea;background:white;color:#555;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:background 0.2s;">Cerrar</button>
           <a href="mailto:${data.correo}" style="text-decoration:none;">
-            <button class="cv-action-btn" style="
-              padding: 9px 20px; border-radius: 8px; border: none;
-              background: #163172; color: white;
-              font-size: 13px; font-weight: 600;
-              font-family: inherit; cursor: pointer;
-              transition: background 0.2s;
-              display: flex; align-items: center; gap: 7px;
-            ">
+            <button class="cv-action-btn" style="padding:9px 20px;border-radius:8px;border:none;background:#163172;color:white;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:background 0.2s;display:flex;align-items:center;gap:7px;">
               <i class="fa-solid fa-envelope"></i> Contactar
             </button>
           </a>
         </div>
 
-      </div>
-    `;
+      </div>`;
 
     document.body.appendChild(modal);
-
-    // Cerrar al hacer clic fuera
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) modal.remove();
-    });
+    modal.addEventListener("click", (e) => { if (e.target === modal) modal.remove(); });
 
   } catch (err) {
     mostrarToast("Error al cargar el CV", "error");
@@ -907,7 +872,7 @@ async function verCVCandidato(candidatoId) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  MIS POSTULACIONES (candidato)
+//  MIS POSTULACIONES
 // ══════════════════════════════════════════════════════════════
 async function cargarMisPostulaciones() {
   const contenedor = document.getElementById("sec-mis-postulaciones");
@@ -965,7 +930,7 @@ function checkListaVacia(contenedorId, selector, mensaje) {
 
 function mostrarToast(mensaje, tipo) {
   const toast = document.createElement("div");
-  toast.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;background:${tipo === "exito" ? "#1a7a4a" : "#c0392b"};color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.25);opacity:0;transition:opacity 0.3s ease;`;
+  toast.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;background:${tipo === "exito" ? "#1a7a4a" : "#c0392b"};color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.25);opacity:0;transition:opacity 0.3s ease;max-width:calc(100vw - 48px);`;
   toast.textContent = mensaje;
   document.body.appendChild(toast);
   requestAnimationFrame(() => toast.style.opacity = "1");
@@ -977,6 +942,7 @@ function mostrarToast(mensaje, tipo) {
 // ══════════════════════════════════════════════════════════════
 document.addEventListener("DOMContentLoaded", () => {
   aplicarRol();
+  initHamburger();
 
   const btnLogout = document.getElementById("btnLogout");
   if (btnLogout) btnLogout.addEventListener("click", cerrarSesion);
