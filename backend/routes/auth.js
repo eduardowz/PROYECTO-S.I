@@ -3,7 +3,6 @@ const router = express.Router();
 const User = require("../models/User");
 const Empresa = require("../models/Empresa");
 const Admin = require("../models/Admin");
-const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const { Resend } = require("resend");
 require("dotenv").config();
@@ -11,19 +10,42 @@ require("dotenv").config();
 const resend = new Resend(process.env.RESEND_API_KEY);
 const intentosFallidos = {};
 
+// ── FUNCIÓN SHA-256 ───────────────────────────────────
+function hashSHA256(password) {
+    return crypto.createHash("sha256").update(password).digest("hex");
+}
+
+// ── VERIFICAR RECAPTCHA ───────────────────────────────
+async function verificarCaptcha(token) {
+    const respuesta = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `secret=${process.env.RECAPTCHA_SECRET}&response=${token}`
+    });
+    const data = await respuesta.json();
+    return data.success;
+}
+
 // ── REGISTRO USUARIO/CANDIDATO ────────────────────────
 router.post("/register", async (req, res) => {
     try {
-        const { nombre, correo, password, tipo, telefono, edad, ubicacion } = req.body;
+        const { nombre, correo, password, tipo, telefono, edad, ubicacion, captcha } = req.body;
 
         if (!nombre || !correo || !password || !tipo)
             return res.status(400).json({ error: "Completa todos los campos" });
+
+        // Verificar reCAPTCHA
+        if (!captcha)
+            return res.status(400).json({ error: "Por favor completa el reCAPTCHA" });
+        const captchaValido = await verificarCaptcha(captcha);
+        if (!captchaValido)
+            return res.status(400).json({ error: "reCAPTCHA inválido, intenta de nuevo" });
 
         const existe = await User.findOne({ correo });
         if (existe)
             return res.status(400).json({ error: "El correo ya está registrado" });
 
-        const passwordHash = await bcrypt.hash(password, 10);
+        const passwordHash = hashSHA256(password);
         const token  = crypto.randomBytes(32).toString("hex");
         const expira = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
@@ -97,10 +119,17 @@ router.get("/verificar/:token", async (req, res) => {
 router.post("/login", async (req, res) => {
     try {
         const correo = req.body.correo || req.body.email;
-        const { password } = req.body;
+        const { password, captcha } = req.body;
 
         if (!correo || !password)
             return res.status(400).json({ error: "Completa todos los campos" });
+
+        // Verificar reCAPTCHA
+        if (!captcha)
+            return res.status(400).json({ error: "Por favor completa el reCAPTCHA" });
+        const captchaValido = await verificarCaptcha(captcha);
+        if (!captchaValido)
+            return res.status(400).json({ error: "reCAPTCHA inválido, intenta de nuevo" });
 
         const claveIntento = correo;
         const ahora = Date.now();
@@ -117,11 +146,12 @@ router.post("/login", async (req, res) => {
             }
         }
 
+        const passwordHash = hashSHA256(password);
+
         // ── Admin ──
         let admin = await Admin.findOne({ correo });
         if (admin) {
-            const passValida = await bcrypt.compare(password, admin.password);
-            if (!passValida) {
+            if (admin.password !== passwordHash) {
                 registrarIntento(claveIntento, ahora);
                 const restantes = 6 - intentosFallidos[claveIntento].contador;
                 return res.status(401).json({
@@ -137,8 +167,7 @@ router.post("/login", async (req, res) => {
         // ── Empresa ──
         let empresa = await Empresa.findOne({ correo });
         if (empresa) {
-            const passValida = await bcrypt.compare(password, empresa.password);
-            if (!passValida)
+            if (empresa.password !== passwordHash)
                 return res.status(401).json({ error: "Credenciales incorrectas" });
             if (!empresa.aprobada)
                 return res.status(403).json({ error: "Tu cuenta está pendiente de aprobación por el administrador" });
@@ -149,8 +178,7 @@ router.post("/login", async (req, res) => {
         // ── Usuario/Candidato ──
         let usuario = await User.findOne({ correo });
         if (usuario) {
-            const passValida = await bcrypt.compare(password, usuario.password);
-            if (!passValida) {
+            if (usuario.password !== passwordHash) {
                 registrarIntento(claveIntento, ahora);
                 const restantes = 6 - intentosFallidos[claveIntento].contador;
                 return res.status(401).json({

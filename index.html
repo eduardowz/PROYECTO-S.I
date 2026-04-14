@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bolsa de Trabajo - Autenticación</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
 
@@ -231,6 +232,9 @@
                         </label>
                     </div>
 
+                    <!-- reCAPTCHA REGISTRO -->
+                    <div class="g-recaptcha" data-sitekey="6LeqVbYsAAAAAKwbidklWzCgyjB13TEqxH9cXt2M" style="margin-bottom:12px;"></div>
+
                     <button type="submit" class="btn-primary">
                         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
                         <span id="textoBotonRegistro">Crear Cuenta como Candidato</span>
@@ -241,7 +245,7 @@
                     </div>
                 </form>
 
-                <!-- LOGIN — sin selección de rol -->
+                <!-- LOGIN -->
                 <form id="formLogin" class="form-panel">
                     <div class="form-head">
                         <h2>Bienvenido de nuevo</h2>
@@ -264,8 +268,6 @@
                         </div>
                     </div>
 
-                    <!-- ✅ Selección de rol ELIMINADA — el backend detecta el rol automáticamente -->
-
                     <div class="login-bottom-row">
                         <label class="checkbox-label inline">
                             <input type="checkbox" id="recordarme">
@@ -273,6 +275,9 @@
                         </label>
                         <a href="#" class="recuperar-link">¿Olvidaste tu contraseña?</a>
                     </div>
+
+                    <!-- reCAPTCHA LOGIN -->
+                    <div class="g-recaptcha" data-sitekey="6LeqVbYsAAAAAKwbidklWzCgyjB13TEqxH9cXt2M" style="margin-bottom:12px;"></div>
 
                     <button type="submit" class="btn-primary">
                         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
@@ -284,8 +289,8 @@
                     </div>
                 </form>
 
-            </div><!-- /card-inner -->
-        </div><!-- /card -->
+            </div>
+        </div>
 
         <div class="info-footer">
             <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>

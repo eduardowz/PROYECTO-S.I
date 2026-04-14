@@ -4,6 +4,14 @@
 //           tabla postulantes responsive, toast responsive
 // ══════════════════════════════════════════════════════════════
 
+// ── PROTECCIÓN DE RUTA ────────────────────────────────
+(function protegerRuta() {
+    const sesion = sessionStorage.getItem("sesionActiva") || localStorage.getItem("sesionActiva");
+    if (!sesion) {
+        window.location.replace("index.html");
+    }
+})();
+
 const API = "https://proyecto-si-production.up.railway.app/api";
 
 const sesionActiva = sessionStorage.getItem("sesionActiva") || localStorage.getItem("sesionActiva");
