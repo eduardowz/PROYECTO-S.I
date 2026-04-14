@@ -1,8 +1,3 @@
-// ══════════════════════════════════════════════════════════════
-//  home.js  —  Versión fusionada completa
-//  Incluye: hamburguesa, Google Maps, animaciones modal CV,
-//           tabla postulantes responsive, toast responsive
-// ══════════════════════════════════════════════════════════════
 
 // ── PROTECCIÓN DE RUTA ────────────────────────────────
 (function protegerRuta() {

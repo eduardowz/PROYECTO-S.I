@@ -4,9 +4,8 @@ const Empresa = require("../models/Empresa");
 const Admin = require("../models/Admin");
 const bcrypt = require("bcryptjs");
 
-// =========================
 // Registro de admin
-// =========================
+
 router.post("/registro", async (req, res) => {
     try {
         const { nombre, correo, password } = req.body;
@@ -29,9 +28,8 @@ router.post("/registro", async (req, res) => {
     }
 });
 
-// =========================
 // Login de admin
-// =========================
+
 router.post("/login", async (req, res) => {
     try {
         const { correo, password } = req.body;
@@ -50,9 +48,8 @@ router.post("/login", async (req, res) => {
     }
 });
 
-// =========================
 // Ver empresas pendientes
-// =========================
+
 router.get("/empresas-pendientes", async (req, res) => {
     try {
         const pendientes = await Empresa.find({ aprobada: false });
@@ -62,9 +59,8 @@ router.get("/empresas-pendientes", async (req, res) => {
     }
 });
 
-// =========================
 // Aprobar empresa
-// =========================
+
 router.put("/aprobar/:id", async (req, res) => {
     try {
         const { id } = req.params;

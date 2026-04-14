@@ -1,8 +1,4 @@
-// ══════════════════════════════════════════════════════════════
-//  home.js  —  Versión fusionada completa
-//  Incluye: hamburguesa, Google Maps, animaciones modal CV,
-//           tabla postulantes responsive, toast responsive
-// ══════════════════════════════════════════════════════════════
+
 
 // ── PROTECCIÓN DE RUTA ────────────────────────────────
 (function protegerRuta() {
@@ -25,7 +21,7 @@ function cerrarSesion() {
 
 // ══════════════════════════════════════════════════════════════
 //  MENÚ HAMBURGUESA
-// ══════════════════════════════════════════════════════════════
+
 function initHamburger() {
   const hamburger   = document.getElementById("hamburger");
   const menuLateral = document.getElementById("menuLateral");
@@ -55,9 +51,9 @@ function cerrarMenu() {
   document.getElementById("sidebarOverlay")?.classList.remove("visible");
 }
 
-// ══════════════════════════════════════════════════════════════
+
 //  NAVEGACIÓN
-// ══════════════════════════════════════════════════════════════
+
 function irAInicio() {
   document.querySelectorAll(".seccion").forEach(s => s.classList.remove("activa"));
   document.querySelectorAll(".menu-lateral nav a").forEach(a => a.classList.remove("activo"));
@@ -93,9 +89,9 @@ function mostrarSeccion(id, el) {
   if (id === "mis-postulaciones")                                cargarMisPostulaciones();
 }
 
-// ══════════════════════════════════════════════════════════════
+
 //  APLICAR ROL
-// ══════════════════════════════════════════════════════════════
+
 function aplicarRol() {
   document.querySelectorAll(".solo-logueado, .solo-candidato, .solo-empresa, .solo-admin")
     .forEach(el => el.style.display = "none");
