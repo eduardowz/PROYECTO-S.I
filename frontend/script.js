@@ -32,6 +32,8 @@ function mostrarTab(tab) {
     tabLoginBtn.classList.toggle("active",    !esRegistro);
     document.getElementById("mensajeRegistro").style.display = "none";
     document.getElementById("mensajeLogin").style.display    = "none";
+    // Resetear reCAPTCHA al cambiar de tab
+    if (typeof grecaptcha !== "undefined") grecaptcha.reset();
 }
 
 tabRegistroBtn.addEventListener("click", () => mostrarTab("registro"));
@@ -40,13 +42,11 @@ tabLoginBtn.addEventListener("click",    () => mostrarTab("login"));
 // ══ ELEMENTOS ════════════════════════════════════════════
 const formRegistro        = document.getElementById("formRegistro");
 const formLogin           = document.getElementById("formLogin");
-
 const nombreRegistro      = document.getElementById("nombreRegistro");
 const correoRegistro      = document.getElementById("correoRegistro");
 const telefonoRegistro    = document.getElementById("telefonoRegistro");
 const passwordRegistro    = document.getElementById("passwordRegistro");
 const passwordConfirm     = document.getElementById("passwordConfirm");
-
 const camposEmpresa       = document.getElementById("camposEmpresa");
 const camposCandidato     = document.getElementById("camposCandidato");
 const rfcEmpresa          = document.getElementById("rfcEmpresa");
@@ -54,14 +54,12 @@ const sitioWeb            = document.getElementById("sitioWeb");
 const direccionEmpresa    = document.getElementById("direccionEmpresa");
 const edadCandidato       = document.getElementById("edadCandidato");
 const ubicacionCandidato  = document.getElementById("ubicacionCandidato");
-
 const checkPrivacidad     = document.getElementById("consentimientoPrivacidad");
 const checkTerminos       = document.getElementById("consentimientoTerminos");
 const checkAntiFraude     = document.getElementById("consentimientoAntiFraude");
 const checkNotificaciones = document.getElementById("consentimientoNotificaciones");
 const checkVerificacion   = document.getElementById("consentimientoVerificacion");
 const checkboxVerificacionEmpresa = document.getElementById("checkboxVerificacionEmpresa");
-
 const mensajeRegistro     = document.getElementById("mensajeRegistro");
 const mensajeLogin        = document.getElementById("mensajeLogin");
 const correoLogin         = document.getElementById("correoLogin");
@@ -70,7 +68,6 @@ const recordarme          = document.getElementById("recordarme");
 const irLogin             = document.getElementById("irLogin");
 const irRegistro          = document.getElementById("irRegistro");
 const textoBotonRegistro  = document.getElementById("textoBotonRegistro");
-
 const radiosTipoUsuario   = document.querySelectorAll('input[name="tipoUsuario"]');
 
 // ══ VALIDACIONES ═════════════════════════════════════════
@@ -111,7 +108,6 @@ radiosTipoUsuario.forEach(radio => {
         camposCandidato.style.display = esEmpresa ? "none" : "grid";
         checkboxVerificacionEmpresa.style.display = esEmpresa ? "flex" : "none";
         textoBotonRegistro.textContent = esEmpresa ? "Crear Cuenta como Empresa" : "Crear Cuenta como Candidato";
-
         rfcEmpresa.required        = esEmpresa;
         direccionEmpresa.required  = esEmpresa;
         checkVerificacion.required = esEmpresa;
@@ -124,6 +120,11 @@ radiosTipoUsuario.forEach(radio => {
 formRegistro.addEventListener("submit", (e) => {
     e.preventDefault();
     mensajeRegistro.style.display = "none";
+
+    // Verificar reCAPTCHA
+    const captchaRegistro = grecaptcha.getResponse(0);
+    if (!captchaRegistro)
+        return mostrarMensaje(mensajeRegistro, "Por favor, completa el reCAPTCHA", "error");
 
     const tipo     = document.querySelector('input[name="tipoUsuario"]:checked').value;
     const nombre   = nombreRegistro.value.trim();
@@ -171,6 +172,7 @@ formRegistro.addEventListener("submit", (e) => {
     const nuevoUsuario = {
         tipo, nombre, correo, telefono, password: pass,
         notificaciones: checkNotificaciones.checked,
+        captcha: captchaRegistro,
         ...(tipo === "empresa"
             ? { rfc: rfcEmpresa.value.trim(), sitioWeb: sitioWeb.value.trim(), direccion: direccionEmpresa.value.trim() }
             : { edad: edadCandidato.value, ubicacion: ubicacionCandidato.value.trim() })
@@ -195,18 +197,28 @@ formRegistro.addEventListener("submit", (e) => {
             formRegistro.reset();
             camposEmpresa.style.display   = "none";
             camposCandidato.style.display = "grid";
+            grecaptcha.reset();
             setTimeout(() => mostrarTab("login"), 3000);
         } else {
             mostrarMensaje(mensajeRegistro, data.error || "Error al registrarse", "error");
+            grecaptcha.reset();
         }
     })
-    .catch(() => mostrarMensaje(mensajeRegistro, "Error al conectar con el servidor", "error"));
+    .catch(() => {
+        mostrarMensaje(mensajeRegistro, "Error al conectar con el servidor", "error");
+        grecaptcha.reset();
+    });
 });
 
 // ══ LOGIN ════════════════════════════════════════════════
 formLogin.addEventListener("submit", (e) => {
     e.preventDefault();
     mensajeLogin.style.display = "none";
+
+    // Verificar reCAPTCHA
+    const captchaLogin = grecaptcha.getResponse(1);
+    if (!captchaLogin)
+        return mostrarMensaje(mensajeLogin, "Por favor, completa el reCAPTCHA", "error");
 
     const correo   = correoLogin.value.trim();
     const password = passwordLogin.value;
@@ -219,7 +231,7 @@ formLogin.addEventListener("submit", (e) => {
     fetch("https://proyecto-si-production.up.railway.app/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ correo, password })
+        body: JSON.stringify({ correo, password, captcha: captchaLogin })
     })
     .then(res => res.json().then(data => ({ ok: res.ok, data })))
     .then(({ ok, data }) => {
@@ -232,14 +244,17 @@ formLogin.addEventListener("submit", (e) => {
             });
             sessionStorage.setItem("sesionActiva", datosSesion);
             if (recordarme.checked) localStorage.setItem("sesionActiva", datosSesion);
-
             mostrarMensaje(mensajeLogin, `Bienvenido, ${data.nombre}`, "exito");
             setTimeout(() => { window.location.href = "home.html"; }, 1200);
         } else {
             mostrarMensaje(mensajeLogin, data.error || "Credenciales incorrectas", "error");
+            grecaptcha.reset();
         }
     })
-    .catch(() => mostrarMensaje(mensajeLogin, "Error al conectar con el servidor", "error"));
+    .catch(() => {
+        mostrarMensaje(mensajeLogin, "Error al conectar con el servidor", "error");
+        grecaptcha.reset();
+    });
 });
 
 // ══ NAVEGACIÓN ═══════════════════════════════════════════

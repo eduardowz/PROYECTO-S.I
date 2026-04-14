@@ -111,7 +111,7 @@ body {
 /* ══ TOPBAR ══ */
 .topbar {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; align-items: center; justify-content: center;
     padding: 13px 36px;
     background: rgba(12,42,56,.78);
     backdrop-filter: blur(14px);
@@ -133,13 +133,7 @@ body {
     color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .04em;
 }
 
-.topbar-badges { display: flex; gap: 8px; }
-.tbadge {
-    font-size: 10.5px; font-weight: 500; padding: 4px 10px;
-    border-radius: 20px; letter-spacing: .02em;
-}
-.tbadge-teal { color: #7ed4e8; border: 1px solid rgba(126,212,232,.25); background: rgba(126,212,232,.08); }
-.tbadge-gold { color: var(--accent); border: 1px solid rgba(240,165,0,.25); background: rgba(240,165,0,.08); }
+.topbar-badges { display: none; }
 
 /* ══ PAGE ══ */
 .page {
@@ -261,7 +255,6 @@ body {
 .radio-content strong { display: block; color: var(--text); font-size: 13px; }
 .radio-content small  { color: var(--text-muted); font-size: 11px; }
 
-/* Login radio inline */
 .radio-group-inline { display: flex; gap: 8px; }
 .radio-label-inline {
     flex: 1; display: flex; align-items: center; justify-content: center;
@@ -299,11 +292,9 @@ body {
 .input-group input::placeholder { color: var(--text-dim); font-size: 13px; }
 .input-group small { color: var(--text-dim); font-size: 11px; }
 
-/* Validación visual */
 .input-group input:invalid:not(:placeholder-shown) { border-color: #dc3545; }
 .input-group input:valid:not(:placeholder-shown)   { border-color: var(--teal); }
 
-/* Password wrap */
 .pw-wrap { position: relative; }
 .pw-wrap input { padding-right: 40px; }
 .toggle-pw {
@@ -313,7 +304,6 @@ body {
 }
 .toggle-pw:hover { opacity: 1; }
 
-/* campos especificos */
 .campos-especificos { animation: slideIn .35s ease; }
 @keyframes slideIn {
     from { opacity: 0; transform: translateY(-6px); }
@@ -385,13 +375,19 @@ body {
 .checkbox-label strong { color: var(--text); font-weight: 600; }
 .checkbox-label.inline { margin-bottom: 0; padding: 0; }
 
-/* Login bottom row */
 .login-bottom-row {
     display: flex; align-items: center; justify-content: space-between;
     margin: 10px 0 4px;
 }
 .recuperar-link { font-size: 12px; color: var(--text-muted); text-decoration: none; transition: color .2s; }
 .recuperar-link:hover { color: var(--teal); text-decoration: underline; }
+
+/* ══ RECAPTCHA ══ */
+.g-recaptcha {
+    display: flex;
+    justify-content: center;
+    margin: 12px 0;
+}
 
 /* ══ BOTÓN ══ */
 .btn-primary {
@@ -465,6 +461,5 @@ input:focus, button:focus, a:focus { outline: 2px solid var(--teal); outline-off
     .radio-group { flex-direction: column; }
     .radio-group-inline { flex-direction: column; }
     .topbar { padding: 12px 18px; }
-    .topbar-badges { display: none; }
     .login-bottom-row { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
